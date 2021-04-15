@@ -1,6 +1,6 @@
 const express = require('express');
 const gigsRouter = express.Router();
-const {gigs} = require('../dummydata');
+const {gigs} = require('../dummydata/gigsdummydata');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
