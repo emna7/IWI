@@ -5,5 +5,5 @@ const clubsRouter = require('./clubs')
 const apiRouter = express.Router();
 
 apiRouter.use('/gigs', gigsRouter);
-apiRouter.use('/clubs', gigsRouter);
+apiRouter.use('/clubs', clubsRouter);
 module.exports = apiRouter;
