@@ -1,6 +1,7 @@
 const express = require('express');
 const gigsRouter = express.Router();
 const Gig = require('../models/gigModel');
+const User = require('../models/userModel');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
@@ -30,9 +31,20 @@ gigsRouter.get('/:id', async (req, res) => {
 gigsRouter.post('/', async (req, res) => {
   try {
     const gig = new Gig({...req.body});
+    // test relationship
+    const user = await User.find().limit(1)
+    console.log("USER", user)
+    gig.createdBy = user[0]._id
+    updateduser = await User.updateOne(
+      { _id: gig.createdBy},
+      {$push: {userGigs: {createdGigs: gig._id}}}
+    )
+    updateduser.save()
+//
     const savedGig = await gig.save();
     res.send(savedGig);
   } catch (error) {
+    console.log("in error")
     res.json({ message: error });
   }
 });
