@@ -36,7 +36,6 @@ clubsRouter.post('/', async (req, res) => {
   }
 });
 
-
 clubsRouter.patch('/:id', async (req, res) => {
   try {
     const updatedClub = await Club.updateOne(

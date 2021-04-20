@@ -20,7 +20,7 @@ usersRouter.get('/:id', async (req, res) => {
     if (!user) {
       res.status(404).send('Cannot be found');
       return;
-    }  
+    }
     res.send(user);
   } catch (error) {
     res.json({ message: error, });
