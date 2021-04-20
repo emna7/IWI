@@ -5,51 +5,59 @@ const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 
-gigsRouter.get('/', function(req, res) {
-  res.send(Gig.find());
+gigsRouter.get('/', async (req, res) => {
+  try {
+  const gigs = await Club.find();
+  res.json(gigs)
+} catch (error) {
+  res.json({ message: error });
+}
 });
 
-gigsRouter.get('/:id', function(req, res) {
-  const club = Gig.findById(req.params.id);
-  if (!gig) {
-    res.status(404).send('Cannot be found');
-    return;
+gigsRouter.get('/:id', async (req, res) => {
+  try {
+    const gig = await Gig.findById(req.params.id);
+    if (!gig) {
+      res.status(404).send('Cannot be found');
+      return;
+    }
+    res.send(gig);
+  } catch (error) {
+    res.json({ message: error });
   }
-  res.send(gig);
 });
 
-gigsRouter.post('/', function(req, res) {
-  const gig = {
-    id: gigs.length + 1
-  };
-  for (let item in req.body) {
-    gig[item] = req.body[`${item}`];
+gigsRouter.post('/', async (req, res) => {
+  try {
+    const gig = new Gig({...req.body});
+    const savedGig = await gig.save();
+    res.send(savedGig);
+  } catch (error) {
+    res.json({ message: error });
   }
-  gigs.push(gig);
-  res.send(gig);
 });
 
-gigsRouter.put('/:id', function(req, res) {
-  const gig = gigs.find(g => g.id == parseInt(req.params.id));
-  if (!gig) {
-    res.status(404).send('Cannot be found');
-    return;
+
+gigsRouter.patch('/:id', async (req, res) => {
+  try {
+    const updatedGig = await Gig.updateOne(
+      { _id: req.params.id },
+      { $set: {...req.body}}
+    );
+    res.json(updatedGig);
+  } catch (error) {
+    res.json({ message: error });
   }
-  iGig = gigs.indexOf(gig);
-  for (let item in req.body) {
-    gigs[iGig][item] = req.body[`${item}`];
-  }
-  res.send(gigs[iGig]);
 });
 
-gigsRouter.delete('/:id', function(req, res) {
-  const gig = gigs.find(g => g.id == parseInt(req.params.id));
-  if (!gig) {
-    res.status(404).send('Cannot be found');
-    return;
+gigsRouter.delete('/:id', async (req, res) => {
+  try {
+    const removedGig = await Gig.remove({ _id: req.params.id });
+    res.json(removedGig);
+  } catch (error) {
+    res.json({ message: error });
   }
-  gigs.splice(gigs.indexOf(gig), 1);
-  res.send(gig);
 });
+
 
 module.exports = gigsRouter;
