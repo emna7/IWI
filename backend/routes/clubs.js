@@ -51,7 +51,7 @@ clubsRouter.patch('/:id', async (req, res) => {
   } catch (error) {
     res.json({ message: error });
   }
-})
+});
 
 clubsRouter.delete('/:id', async (req, res) => {
   try {
