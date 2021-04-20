@@ -8,9 +8,9 @@ clubsRouter.get('/', async (req, res) => {
   try {
   const clubs = await Club.find();
   res.json(clubs)
-} catch (error) {
-  res.json({ message: error });
-}
+  } catch (error) {
+    res.json({ message: error });
+  }
 });
 
 clubsRouter.get('/:id', async (req, res) => {
