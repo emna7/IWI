@@ -1,16 +1,16 @@
 const express = require('express');
 const gigsRouter = express.Router();
-const {gigs} = require('../dummydata/gigsdummydata');
+const Gig = require('../models/gigschema');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 
 gigsRouter.get('/', function(req, res) {
-  res.send(gigs);
+  res.send(Gig.find());
 });
 
 gigsRouter.get('/:id', function(req, res) {
-  const gig = gigs.find(g => g.id == parseInt(req.params.id));
+  const club = Gig.findById(req.params.id);
   if (!gig) {
     res.status(404).send('Cannot be found');
     return;
