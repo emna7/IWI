@@ -4,7 +4,6 @@ const Club = require('../models/clubschema');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
-
 clubsRouter.get('/', async (req, res) => {
   try {
   const clubs = await Club.find();
@@ -30,9 +29,6 @@ clubsRouter.get('/:id', async (req, res) => {
 clubsRouter.post('/', async (req, res) => {
   try {
     const club = new Club({...req.body});
-    // for (let item in req.body) {
-    //   club[item] = req.body[`${item}`];
-    // }
     const savedClub = await club.save();
     res.send(savedClub);
   } catch (error) {
@@ -51,7 +47,7 @@ clubsRouter.patch('/:id', async (req, res) => {
   } catch (error) {
     res.json({ message: error });
   }
-})
+});
 
 clubsRouter.delete('/:id', async (req, res) => {
   try {

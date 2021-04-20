@@ -1,54 +1,62 @@
 const express = require('express');
 const usersRouter = express.Router();
 const bodyParser = require('body-parser');
+const User = require('../models/userschema');
 const jsonParser = bodyParser.json();
 
 
-usersRouter.get('/', function(req, res) {
-  res.send(users);
+usersRouter.get('/', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    res.json({ message: error, });
+  }
 });
 
-usersRouter.get('/:id', function(req, res) {
-  const user = users.find(g => g.id == parseInt(req.params.id));
-  if (!user) {
-    res.status(404).send('Cannot be found');
-    return;
+usersRouter.get('/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      res.status(404).send('Cannot be found');
+      return;
+    }  
+    res.send(user);
+  } catch (error) {
+    res.json({ message: error, });
   }
   res.send(user);
 });
 
-usersRouter.post('/', function(req, res) {
-  const user = {
-    id: users.length + 1
-  };
-  for (let item in req.body) {
-    user[item] = req.body[`${item}`];
+usersRouter.post('/', async (req, res) => {
+  try {
+    const user = new User({...req.body});
+    const savedUser = await user.save();
+    res.send(savedUser);
+  } catch (error) {
+    res.json({ message: error });
   }
-  users.push(user);
-  res.send(user);
 });
 
-usersRouter.put('/:id', function(req, res) {
-  const user = users.find(g => g.id == parseInt(req.params.id));
-  if (!user) {
-    res.status(404).send('Cannot be found');
-    return;
+usersRouter.patch('/:id', async (req, res) => {
+  try {
+    const updatedUser = await User.updateOne(
+      { _id: req.params.id },
+      { $set: {...req.body}}
+    );
+    res.json(updatedUser);
+  } catch (error) {
+    res.json({ message: error });
   }
-  iuser = users.indexOf(user);
-  for (let item in req.body) {
-    users[iuser][item] = req.body[`${item}`];
-  }
-  res.send(users[iuser]);
 });
 
-usersRouter.delete('/:id', function(req, res) {
-  const user = users.find(g => g.id == parseInt(req.params.id));
-  if (!user) {
-    res.status(404).send('Cannot be found');
-    return;
+usersRouter.delete('/:id', async (req, res) => {
+  try {
+    const removedUser = await User.remove({ _id: req.params.id });
+    res.json(removedUser);
+  } catch (error) {
+    res.json({ message: error });
   }
-  users.splice(users.indexOf(user), 1);
-  res.send(user);
 });
 
 module.exports = usersRouter;
