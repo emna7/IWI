@@ -1,13 +1,13 @@
 const express = require('express');
 const gigsRouter = express.Router();
-const Gig = require('../models/gigschema');
+const Gig = require('../models/gigModel');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 
 gigsRouter.get('/', async (req, res) => {
   try {
-  const gigs = await Club.find();
+  const gigs = await Gig.find();
   res.json(gigs)
 } catch (error) {
   res.json({ message: error });

@@ -1,6 +1,6 @@
 const express = require('express');
 const clubsRouter = express.Router();
-const Club = require('../models/clubschema');
+const Club = require('../models/clubModel');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
