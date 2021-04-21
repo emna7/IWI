@@ -40,11 +40,11 @@ usersRouter.post('/', async (req, res) => {
 
 usersRouter.patch('/:id', async (req, res) => {
   try {
-    const updatedUser = await User.updateOne(
+    const updated = await User.updateOne(
       { _id: req.params.id },
       { $set: {...req.body}}
     );
-    res.json(updatedUser);
+    // res.send("updated");
   } catch (error) {
     res.json({ message: error });
   }

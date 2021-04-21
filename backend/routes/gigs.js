@@ -30,26 +30,18 @@ gigsRouter.get('/:id', async (req, res) => {
 
 gigsRouter.post('/', async (req, res) => {
   try {
-    let gig = new Gig({...req.body});
-    // test relationship
+    // get the creator of the gig
     const user = await User.find().limit(1)
-    console.log("USER", user)
-    // gig.createdBy = user[0]._id
-    gig = Gig.updateOne(
-      {_id: gig._id},
-      { $set: { 'createdBy': user[0]._id } },
-      (err, doc) => {
-        if (err) return res.json({ message: err, });
-        res.json(doc);
-      }
-    );
+    // relationship: Connect the gig to the user and vice versa
+    let gig = new Gig({...req.body, createdBy: user[0]._id});
+    //
+    const savedGig = await gig.save();
     let updateduser = await User.updateOne(
       { _id: gig.createdBy},
-      {$push: {userGigs: {createdGigs: gig._id}}}
+      {$push: {'userGigs.createdGigs': gig._id}}
     );
-    updateduser.save();
-    const savedGig = await gig.save();
-    res.send(savedGig);
+    
+    res.send("A new gig created");
   } catch (error) {
     console.log("in error");
     res.json({ message: error });
