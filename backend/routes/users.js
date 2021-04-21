@@ -3,6 +3,7 @@ const usersRouter = express.Router();
 const bodyParser = require('body-parser');
 const User = require('../models/userModel');
 const jsonParser = bodyParser.json();
+const jwt = require('jsonwebtoken');
 
 
 usersRouter.get('/', async (req, res) => {
@@ -28,7 +29,7 @@ usersRouter.get('/:id', async (req, res) => {
   res.send(user);
 });
 
-usersRouter.post('/', async (req, res) => {
+usersRouter.post('/signup', async (req, res) => {
   try {
     const user = new User({...req.body});
     const savedUser = await user.save();
@@ -37,6 +38,18 @@ usersRouter.post('/', async (req, res) => {
     res.json({ message: error });
   }
 });
+usersRouter.post('/login', async (req, res) => {
+  try {
+    const user = await User.findOne({"email": req.body.email});
+    if (!user) return res.send('Email not found');
+    if (user.password != req.body.password) return res.send("wrong password");
+    console.log("user iddd", user._id);
+    const token = jwt.sign({"_id": user._id}, process.env.SECRET_TOKEN);
+    res.header('auth-token', token).send(token);
+
+} catch (error) {
+  res.json({ message: error });
+}});
 
 usersRouter.patch('/:id', async (req, res) => {
   try {

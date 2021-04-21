@@ -4,6 +4,7 @@ const Gig = require('../models/gigModel');
 const User = require('../models/userModel');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+const auth = require('./auth');
 
 
 gigsRouter.get('/', async (req, res) => {
@@ -28,20 +29,21 @@ gigsRouter.get('/:id', async (req, res) => {
   }
 });
 
-gigsRouter.post('/', async (req, res) => {
+gigsRouter.post('/', auth, async (req, res) => {
   try {
+    res.send(req.userId)
     // get the creator of the gig
-    const user = await User.find().limit(1)
-    // relationship: Connect the gig to the user and vice versa
-    let gig = new Gig({...req.body, createdBy: user[0]._id});
+    // const user = await User.find().limit(1)
+    // // relationship: Connect the gig to the user and vice versa
+    // let gig = new Gig({...req.body, createdBy: user[0]._id});
+    // //
+    // const savedGig = await gig.save();
+    // let updateduser = await User.updateOne(
+    //   { _id: gig.createdBy},
+    //   {$push: {'userGigs.createdGigs': gig._id}}
+    // );
     //
-    const savedGig = await gig.save();
-    let updateduser = await User.updateOne(
-      { _id: gig.createdBy},
-      {$push: {'userGigs.createdGigs': gig._id}}
-    );
-    
-    res.send("A new gig created");
+    // res.send("A new gig created");
   } catch (error) {
     console.log("in error");
     res.json({ message: error });
