@@ -12,6 +12,10 @@ const commentschema = mongoose.Schema({
         type: Date,
         default: Date.now
       },
+    isNested: {
+        type: Boolean,
+        default: false
+    },
     replies: [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}]
 })
 

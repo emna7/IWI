@@ -6,7 +6,10 @@ const Comment = require('../models/commentModel');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const auth = require('./auth');
+
+
 // GENERAL (FOR BOTH GIG CREATORS AND USUAL USERS)---------------START
+
 // GET ALL GIGS
 gigsRouter.get('/', async (req, res) => {
   try {
@@ -250,6 +253,9 @@ gigsRouter.delete('/:id', async (req, res) => {
 
 // GIG CREATOR JOURNEY ------------------END
 
+
+
+
 // GIG APPLICANT JOURNEY ------------------START
 // Apply to a gig - Cancel application
 
@@ -299,8 +305,6 @@ gigsRouter.post('/:id/cancel', auth, async (req, res) => {
   }
 });
 // GIG APPLICANT JOURNEY ------------------END
-
-
 
 
 module.exports = gigsRouter;
