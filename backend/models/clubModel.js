@@ -8,7 +8,10 @@ const clubschema = mongoose.Schema({
     profilePicture: String,
     location: {country: String, state: String, City: String},
     createdBy: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
-    createdAt: Date,
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
     Admins: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "User"

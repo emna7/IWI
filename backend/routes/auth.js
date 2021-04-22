@@ -1,13 +1,12 @@
 const jwt = require('jsonwebtoken');
 module.exports =  function (req, res, next) {
   const token = req.header('auth-token');
-  if (!token) return res.send('Sorry! You are not logged in!');
+  if (!token) return res.send('Please login!');
   try {
     const verified = jwt.verify(token, process.env.SECRET_TOKEN);
-    console.log("verrriiffiiieddd", verified);
-    req.userId = verified;
+    req.user = verified;
     next();
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: "Permission Denied" });
   }
 }

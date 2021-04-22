@@ -5,12 +5,15 @@ const userschema = mongoose.Schema({
 	lastName: String,
   username: {
     type: String,
-    unique: true,
   },
   email: {
     type: String,
     unique: true,
   },
+	createdAt: {
+		type: Date,
+		default: Date.now
+	},
   password: String,
   gender: String,
   birthday: Date,

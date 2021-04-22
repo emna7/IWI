@@ -32,7 +32,8 @@ usersRouter.get('/:id', async (req, res) => {
 usersRouter.post('/signup', async (req, res) => {
   try {
     const user = new User({...req.body});
-    const savedUser = await user.save();
+    console.log("my user", user);
+    const savedUser = await user.save( (err) => console.log("ERROR", err));
     res.send(savedUser);
   } catch (error) {
     res.json({ message: error });

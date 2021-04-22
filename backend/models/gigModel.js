@@ -9,7 +9,10 @@ const gigschema = mongoose.Schema({
   takesPlace: {from: Date, to: Date},
   location: {country: String, state: String, City: String},
   createdBy: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
-  createdAt: Date,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
   applicants: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
