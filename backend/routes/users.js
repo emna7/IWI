@@ -43,7 +43,7 @@ usersRouter.post('/signup', async (req, res) => {
     // SIGNUP INPUT DATA VALIDATION
     const alreadyExist = await User.findOne({"email": req.body.email});
     if (alreadyExist) return res.send('Email already exists');
-    // hash password 
+    // hash password
     const salt = await bcrypt.genSalt(10);
     const hashpassword = await bcrypt.hash(req.body.password, salt);
 
@@ -147,6 +147,7 @@ usersRouter.post('/logout', auth, async (req, res) => {
   try {
     console.log("INNNNN")
     const destroyed = await jwtr.destroy({"_id": req.user._id});
+    res.header('auth-token', '');
     console.log("logged out!", destroyed);
     res.json("logged out!");
   } catch (error) {
