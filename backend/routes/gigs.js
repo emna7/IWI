@@ -110,7 +110,7 @@ gigsRouter.post('/:gigId/reviews/:reviewId/reply', auth, async (req, res) => {
 
 // GIG CREATOR JOURNEY ------------------START
 // Create a gig - Edit the gig - view applicants and acceptedApplicants -
-// Accept/refuse applicants - delete the gig
+// Accept/refuse applicants - close and reopen the gig - delete the gig
 
 // Create a new gig
 gigsRouter.post('/', auth, async (req, res) => {
@@ -232,6 +232,32 @@ gigsRouter.post('/:gigId/applicants/refuse/:userId', auth, async (req, res) => {
   }
 });
 
+// CLOSE AND REOPEN YOUR GIG
+gigsRouter.patch('/:id/close', auth, async (req, res) => {
+  try {
+    const gig = await Gig.findById(req.params.id);
+    if (!gig) {
+      res.status(404).send('Cannot be found');
+      return;
+    }
+    if (gig.createdBy != req.user._id) {
+      return res.send("you can't close or reopen the gig because it's not yours");
+    }
+
+    let closeGig = {"closed": !(gig.closed)}
+    if (closeGig.closed == true) {
+      closeGig.closedAt = Date.now;
+    }
+
+    const updatedGig = await Gig.updateOne(
+      { _id: req.params.id },
+      { $set: closeGig}
+    );
+    res.json(gig);
+  } catch (error) {
+    res.json({ message: error });
+  }
+});
 
 // DELETE YOUR GIG
 gigsRouter.delete('/:id', async (req, res) => {
@@ -269,6 +295,10 @@ gigsRouter.post('/:id/apply', auth, async (req, res) => {
     }
     if (gig.createdBy == req.user._id)
     return res.send("you can't apply to your own gig!");
+
+    if (gig.closed)
+    return res.send("you can't apply to a closed gig!");
+    
     gig.applicants.push(req.user._id);
     const savedGig = await gig.save();
     let updateduser = await User.updateOne(

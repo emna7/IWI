@@ -25,6 +25,10 @@ const gigschema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Comment"
   }],
+  closed: {
+    type: Boolean,
+    default: false
+  },
   closedAt: Date
 });
 
