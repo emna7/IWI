@@ -2,18 +2,15 @@ const express = require('express');
 const usersRouter = express.Router();
 const bodyParser = require('body-parser');
 const User = require('../models/userModel');
-const jsonParser = bodyParser.json();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('./auth');
 
 // use jwt-redis instead of jwt
-// const redis = require('redis');
-// const JWTR =  require('jwt-redis').default;
-// const redisClient = redis.createClient();
-// const jwtr = new JWTR(redisClient);
-//
-
+const redis = require('redis');
+const JWTR =  require('jwt-redis').default;
+const redisClient = redis.createClient();
+const jwtr = new JWTR(redisClient);
 
 usersRouter.get('/', async (req, res) => {
   try {
@@ -59,19 +56,6 @@ usersRouter.post('/signup', async (req, res) => {
   }
 });
 
-// usersRouter.post('/login', async (req, res) => {
-//   try {
-//     const user = await User.findOne({"email": req.body.email});
-//     if (!user) return res.send('Email not found');
-//     if (user.password != req.body.password) return res.send("wrong password");
-//     const token = await jwtr.sign({"_id": user._id}, process.env.SECRET_TOKEN);
-//     console.log(token)
-//     res.header('auth-token', token).send(token);
-
-// } catch (error) {
-//   res.json({ message: error });
-// }});
-
 usersRouter.post('/login', async (req, res) => {
   try {
     // LOGIN INPUT DATA VALIDATION
@@ -83,12 +67,19 @@ usersRouter.post('/login', async (req, res) => {
     // Check Password
     const correctPassword = await bcrypt.compare(req.body.password, user.password);
     if (!correctPassword) return res.send("wrong password");
-    // Create a token and send it to the client
-    const token = await jwtr.sign({"_id": user._id}, process.env.SECRET_TOKEN);
-    console.log(token)
-    res.header('auth-token', token).send(token);
-
-} catch (error) {
+    jwtr.sign(
+      {"_id": user._id},
+      process.env.SECRET_TOKEN
+    ).then((token) => {
+      console.log(token);
+      res.header('auth-token', token);
+      res.json({ token: token });
+    }).catch((error) => {
+      console.log(`error = ${error}`);
+      res.json({ message: error });
+    });
+  } catch (error) {
+  console.log('hani fil error');
   res.json({ message: error });
 }});
 
@@ -161,8 +152,7 @@ usersRouter.delete('/:id', auth, async (req, res) => {
 
 usersRouter.post('/logout', auth, async (req, res) => {
   try {
-    console.log("INNNNN")
-    const destroyed = await jwtr.destroy({"_id": req.user._id});
+    const destroyed = await jwtr.destroy(req.user.jti);
     res.header('auth-token', '');
     console.log("logged out!", destroyed);
     res.json("logged out!");
@@ -170,4 +160,5 @@ usersRouter.post('/logout', auth, async (req, res) => {
     res.json({ message: error, });
   }
 });
+
 module.exports = usersRouter;
