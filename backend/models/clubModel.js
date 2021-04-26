@@ -20,7 +20,7 @@ const clubschema = mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "User"
    }],
-   awaitingRequests: [{
+   pendingRequests: [{
      type: mongoose.Schema.Types.ObjectId,
      ref: "User"
    }],

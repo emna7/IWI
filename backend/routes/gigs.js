@@ -298,7 +298,7 @@ gigsRouter.post('/:id/apply', auth, async (req, res) => {
 
     if (gig.closed)
     return res.send("you can't apply to a closed gig!");
-    
+
     gig.applicants.push(req.user._id);
     const savedGig = await gig.save();
     let updateduser = await User.updateOne(

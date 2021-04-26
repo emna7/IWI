@@ -57,7 +57,7 @@ const userschema = mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Club"
     }],
-    awaitingRequests: [{
+    pendingRequests: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Club"
     }]
