@@ -10,10 +10,11 @@ const Event = require('../models/eventModel');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const auth = require('./auth');
+const commentsRouter = require('./comments');
 
-// clubsRouter.use('/:clubId/posts', postsRouter);
-// usersRouter.use('/:userId/posts', postsRouter);
-// eventsRouter.use('/:eventId/posts', postsRouter);
+
+postsRouter.use('/:postId/comments', commentsRouter);
+
 
 const parents = {
   'clubId': Club,
@@ -70,7 +71,6 @@ postsRouter.post('/', auth, async (req, res) => {
       res.status(404).send('Cannot be found');
       return;
     }
-
     if (p == 'userId' && parent._id != req.user._id)
     {
       res.status(404).send('Permission Denied');
@@ -148,7 +148,7 @@ postsRouter.delete('/:id', async (req, res) => {
       return res.send("you can't remove the post because it's not yours");
     }
     let updatedUser = await User.updateOne(
-      { _id: req.user._id},
+      { _id: post.createdBy},
       {$pull: {'posts': post._id}}
     );
     if (p != 'userId') {

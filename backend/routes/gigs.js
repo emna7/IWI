@@ -6,7 +6,10 @@ const Comment = require('../models/commentModel');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const auth = require('./auth');
+const commentsRouter = require('./comments');
 
+
+gigsRouter.use('/:gigId/reviews', commentsRouter);
 
 // GENERAL (FOR BOTH GIG CREATORS AND USUAL USERS)---------------START
 

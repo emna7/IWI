@@ -5,6 +5,10 @@ const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('./auth');
+const postsRouter = require('./posts');
+
+
+usersRouter.use('/:userId/posts', postsRouter);
 
 // use jwt-redis instead of jwt
 const redis = require('redis');

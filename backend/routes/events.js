@@ -5,6 +5,10 @@ const User = require('../models/userModel');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const auth = require('./auth');
+const postsRouter = require('./posts');
+
+
+eventsRouter.use('/:eventId/posts', postsRouter);
 
 eventsRouter.get('/', async (req, res) => {
   try {
