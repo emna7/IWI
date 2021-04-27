@@ -24,6 +24,7 @@ const clubschema = mongoose.Schema({
      type: mongoose.Schema.Types.ObjectId,
      ref: "User"
    }],
+   posts: [{type: mongoose.Schema.Types.ObjectId, ref: "Post"}]
 })
 
 module.exports = mongoose.model("Club", clubschema)

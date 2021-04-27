@@ -5,6 +5,9 @@ const User = require('../models/userModel');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const auth = require('./auth');
+const postsRouter = require('./posts');
+
+clubsRouter.use('/:clubId/posts', postsRouter);
 
 // GENERAL
 clubsRouter.get('/', async (req, res) => {
@@ -58,7 +61,7 @@ clubsRouter.post('/', auth, async (req, res) => {
   }
 });
 
-clubsRouter.patch('/:id', async (req, res) => {
+clubsRouter.patch('/:id', auth, async (req, res) => {
   try {
     const club = await Club.findById(req.params.id);
     if (!club) {
@@ -168,7 +171,7 @@ clubsRouter.post('/:clubId/members/delete/:userId', auth, async (req, res) => {
   }
 });
 
-clubsRouter.delete('/:id', async (req, res) => {
+clubsRouter.delete('/:id', auth, async (req, res) => {
   try {
     const club = await Club.findById(req.params.id);
     if (!club) {

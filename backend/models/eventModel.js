@@ -10,7 +10,7 @@ const eventschema = mongoose.Schema({
       type: Date,
       default: Date.now
     },
-    eventPosts: [{type: mongoose.Schema.Types.ObjectId, ref: "Post"}],
+    posts: [{type: mongoose.Schema.Types.ObjectId, ref: "Post"}],
     participants: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "User"

@@ -28,7 +28,7 @@ const userschema = mongoose.Schema({
   location: {country: String, state: String, City: String},
   phone: String,
   biography: String,
-	userPosts: [{type: mongoose.Schema.Types.ObjectId, ref: "Post"}],
+	posts: [{type: mongoose.Schema.Types.ObjectId, ref: "Post"}],
 	userComments: [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}],
   userGigs: {
     createdGigs: [{
