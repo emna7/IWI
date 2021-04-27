@@ -36,77 +36,8 @@ gigsRouter.get('/:id', async (req, res) => {
     res.json({ message: error });
   }
 });
-// View reviews and replies(?) of a specific gig
-gigsRouter.get('/:id/reviews', async (req, res) => {
-  try {
-    const gig = await Gig.findById(req.params.id);
-    if (!gig) {
-      res.status(404).send('Cannot be found');
-      return;
-    }
-    res.send(gig.reviews);
-  } catch (error) {
-    res.json({ message: error });
-  }
-});
 
-// Review the gig (only for gig creators and accepted applicants)
-gigsRouter.post('/:id/reviews', auth, async (req, res) => {
-  try {
-    const gig = await Gig.findById(req.params.id);
-    if (!gig) {
-      res.status(404).send('Cannot be found');
-      return;
-    }
-    if (gig.createdBy != req.user._id && !gig.acceptedApplicants.includes(req.user._id))
-    return res.send("you must be the creator or an accepted applicant to review!");
 
-    let commment = new Comment({...req.body, createdBy: req.user._id, createdIn: req.params.id});
-    const savedcomment = await comment.save();
-    let updateduser = await User.updateOne(
-      { _id: comment.createdBy},
-      {$push: {'userComments': comment._id}}
-    );
-    let updatedgig = await Gig.updateOne(
-      { _id: comment.createdIn},
-      {$push: {'reviews': comment._id}}
-    );
-    res.send("Your review is added to the gig!");
-  } catch (error) {
-    console.log("in error");
-    res.json({ message: "error" });
-  }
-});
-
-// Reply to a review
-gigsRouter.post('/:gigId/reviews/:reviewId/reply', auth, async (req, res) => {
-  try {
-    const gig = await Gig.findById(req.params.gigId);
-    if (!gig || !gig.reviews.includes(reviewId)) {
-      res.status(404).send('Cannot be found');
-      return;
-    }
-    const review = await Comment.findById(req.params.reviewId);
-    if (!review) {
-      res.status(404).send('Cannot be found');
-      return;
-    }
-    let commment = new Comment({...req.body, createdBy: req.user._id, createdIn: req.params.reviewId});
-    const savedcomment = await comment.save();
-    let updateduser = await User.updateOne(
-      { _id: comment.createdBy},
-      {$push: {'userComments': comment._id}}
-    );
-    let updatedcomment = await Comment.updateOne(
-      { _id: comment.createdIn},
-      {$push: {'replies': comment._id}}
-    );
-    res.send("Your reply is added to the comment!");
-  } catch (error) {
-    console.log("in error");
-    res.json({ message: "error" });
-  }
-});
 // GENERAL (FOR BOTH GIG CREATORS AND USUAL USERS)---------------END
 
 

@@ -29,7 +29,7 @@ const userschema = mongoose.Schema({
   phone: String,
   biography: String,
 	posts: [{type: mongoose.Schema.Types.ObjectId, ref: "Post"}],
-	userComments: [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}],
+	comments: [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}],
   userGigs: {
     createdGigs: [{
       type: mongoose.Schema.Types.ObjectId,
