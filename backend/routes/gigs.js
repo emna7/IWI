@@ -123,14 +123,24 @@ gigsRouter.post('/:gigId/applicants/accept/:userId', auth, async (req, res) => {
     gig.applicants.splice(req.params.userId, 1)
     gig.acceptedApplicants.push(req.params.userId);
     const savedGig = await gig.save();
+
+    const user = await User.findById(req.user._id)
+    const acceptedUser = await User.findById(req.params.userId)
+    const notif = {
+      action: 'GigApplicantAccepted',
+      links: [{content: user.username, id: req.user._id}, {content: gig.title, id: gig._id}],
+      from: req.user._id,
+      to: acceptedUser._id,
+    }
     let updateduser = await User.updateOne(
       { _id: req.params.userId},
-      {$push: {'userGigs.acceptedAtGigs': gig._id}}
+      {$push: {'userGigs.acceptedAtGigs': gig._id}, $pull: {'userGigs.appliedToGigs': gig._id}, $push: {'notifications': notif}}
     );
-    updateduser = await User.updateOne(
-      { _id: req.params.userId},
-      {$pull: {'userGigs.appliedToGigs': gig._id}}
-    );
+    // updateduser = await User.updateOne(
+    //   { _id: req.params.userId},
+    //   {$pull: {'userGigs.appliedToGigs': gig._id}}
+    // );
+
     res.send("You accepted an applicant at your gig!");
   } catch (error) {
     console.log("in error");
@@ -155,9 +165,18 @@ gigsRouter.post('/:gigId/applicants/refuse/:userId', auth, async (req, res) => {
     }
     gig.applicants.splice(req.params.userId, 1)
     const savedGig = await gig.save();
+
+    const user = await User.findById(req.user._id)
+    const refusedUser = await User.findById(req.params.userId)
+    const notif = {
+      action: 'GigApplicantRefused',
+      links: [{content: user.username, id: req.user._id}, {content: gig.title, id: gig._id}],
+      from: req.user._id,
+      to: refusedUser._id,
+    }
     updateduser = await User.updateOne(
       { _id: req.params.userId},
-      {$pull: {'userGigs.appliedToGigs': gig._id}}
+      {$pull: {'userGigs.appliedToGigs': gig._id}, $push: {'notifications': notif}}
     );
     res.send("You refused an applicant at your gig!");
   } catch (error) {
@@ -235,9 +254,22 @@ gigsRouter.post('/:id/apply', auth, async (req, res) => {
 
     gig.applicants.push(req.user._id);
     const savedGig = await gig.save();
+
+    const owner = await User.findById(gig.createdBy)
+    const user = await User.findById(req.user._id)
+    const notif = {
+      action: 'GigApplicantApplied',
+      links: [{content: user.username, id: req.user._id}, {content: gig.title, id: gig._id}],
+      from: req.user._id,
+      to: gig.createdBy,
+    }
     let updateduser = await User.updateOne(
-      { _id: gig.createdBy},
+      { _id: req.user._id},
       {$push: {'userGigs.appliedToGigs': gig._id}}
+    );
+    updateduser = await User.updateOne(
+      { _id: gig.createdBy},
+      {$push: {'notifications': notif}}
     );
     res.send("You applied to the gig!");
   } catch (error) {

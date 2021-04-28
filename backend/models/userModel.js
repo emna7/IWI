@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+const Notification = require("./notificationModel")
 
 const userschema = mongoose.Schema({
 	firstName: String,
@@ -30,6 +31,7 @@ const userschema = mongoose.Schema({
   biography: String,
 	posts: [{type: mongoose.Schema.Types.ObjectId, ref: "Post"}],
 	comments: [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}],
+	notifications: [Notification],
   userGigs: {
     createdGigs: [{
       type: mongoose.Schema.Types.ObjectId,
