@@ -87,6 +87,7 @@ eventsRouter.post('/:id/participants', auth, async (req, res) => {
       return;
     }
     const user = await User.findById(req.user._id);
+    const owner = await User.findById(event.createdBy)
 
     let updatedEvent = await Event.updateOne(
       { _id: req.params.id},
@@ -95,6 +96,17 @@ eventsRouter.post('/:id/participants', auth, async (req, res) => {
     let updatedUser = await User.updateOne(
       { _id: user._id},
       {$push: {'userEvents.participantInEvents': event._id}}
+    );
+
+    const notif = {
+      action: 'EventParticipant',
+      links: [{content: user.username, id: req.user._id}, {content: event.title, id: event._id}],
+      from: req.user._id,
+      to: owner._id,
+    }
+    updatedUser = await User.updateOne(
+      { _id: owner._id},
+      {$push: {'notifications': notif}}
     );
 
     if (event.interested.includes(user._id)) {
@@ -159,6 +171,7 @@ eventsRouter.post('/:id/interested', auth, async (req, res) => {
       return;
     }
     const user = await User.findById(req.user._id);
+    const owner = await User.findById(event.createdBy)
 
     let updatedEvent = await Event.updateOne(
       { _id: req.params.id},
@@ -169,6 +182,17 @@ eventsRouter.post('/:id/interested', auth, async (req, res) => {
       {$push: {'userEvents.interestedInEvents': event._id}}
     );
 
+    const notif = {
+      action: 'EventInterested',
+      links: [{content: user.username, id: req.user._id}, {content: event.title, id: event._id}],
+      from: req.user._id,
+      to: owner._id,
+    }
+    updatedUser = await User.updateOne(
+      { _id: owner._id},
+      {$push: {'notifications': notif}}
+    );
+    
     if (event.participants.includes(req.user._id)) {
       let updatedEvent = await Event.updateOne(
         { _id: req.params.id},

@@ -100,14 +100,22 @@ clubsRouter.post('/:clubId/requests/accept/:userId', auth, async (req, res) => {
     club.members.push(req.params.userId);
     const savedClub = await club.save();
 
+    const user = await User.findById(req.user._id)
+    const acceptedUser = await User.findById(req.params.userId)
+    const notif = {
+      action: 'ClubMemberAccepted',
+      links: [{content: user.username, id: req.user._id}, {content: club.title, id: club._id}],
+      from: req.user._id,
+      to: acceptedUser._id,
+    }
     let updateduser = await User.updateOne(
       { _id: req.params.userId},
-      {$push: {'userClubs.joinedClubs': club._id}}
+      {$push: {'userClubs.joinedClubs': club._id}, $pull: {'userClubs.pendingRequests': club._id}, $push: {'notifications': notif}}
     );
-    updateduser = await User.updateOne(
-      { _id: req.params.userId},
-      {$pull: {'userClubs.pendingRequests': club._id}}
-    );
+    // updateduser = await User.updateOne(
+    //   { _id: req.params.userId},
+    //   {$pull: {'userClubs.pendingRequests': club._id}}
+    // );
     res.send("You accepted a new member at your club!");
   } catch (error) {
     console.log("in error");
@@ -203,8 +211,21 @@ clubsRouter.post('/:id/join', auth, async (req, res) => {
 
     club.pendingRequests.push(req.user._id);
     const savedClub = await club.save();
+
+    const owner = await User.findById(club.createdBy)
+    const user = await User.findById(req.user._id)
+    const notif = {
+      action: 'ClubMemberAcceptedRequest',
+      links: [{content: user.username, id: req.user._id}, {content: club.title, id: club._id}],
+      from: req.user._id,
+      to: club.createdBy,
+    }
     let updateduser = await User.updateOne(
       { _id: club.createdBy},
+      {$push: {'notifications': notif}}
+    );
+    updateduser = await User.updateOne(
+      { _id: req.user._id},
       {$push: {'userClubs.pendingRequests': club._id}}
     );
     res.send("You sent a request to join the club!");
@@ -230,7 +251,7 @@ clubsRouter.post('/:id/cancel', auth, async (req, res) => {
     club.pendingRequests.splice(req.user._id, 1);
     const savedClub = await club.save();
     let updateduser = await User.updateOne(
-      { _id: club.createdBy},
+      { _id: req.user._id},
       {$pull: {'userClubs.pendingRequests': club._id}}
     );
     res.send("Cancelation is done");
@@ -256,7 +277,7 @@ clubsRouter.post('/:id/leave', auth, async (req, res) => {
     club.members.splice(req.user._id, 1);
     const savedClub = await club.save();
     let updateduser = await User.updateOne(
-      { _id: club.createdBy},
+      { _id: req.user._id},
       {$pull: {'userClubs.joinedClubs': club._id}}
     );
     res.send("You left the club!");

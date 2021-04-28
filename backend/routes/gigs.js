@@ -291,7 +291,7 @@ gigsRouter.post('/:id/cancel', auth, async (req, res) => {
     gig.applicants.splice(req.user._id, 1);
     const savedGig = await gig.save();
     let updateduser = await User.updateOne(
-      { _id: gig.createdBy},
+      { _id: req.user._id},
       {$pull: {'userGigs.appliedToGigs': gig._id}}
     );
     res.send("Cancelation is done");
