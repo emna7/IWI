@@ -6,6 +6,7 @@
   "scripts": {
     "backend": "nodemon --exec babel-node app.js",
     "frontend": "webpack serve --mode development --config config/webpack.config.js",
+    "build-frontend": "webpack -- mode production --config config/webpack.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
