@@ -205,7 +205,7 @@ gigsRouter.delete('/:id', async (req, res) => {
       return res.send("you can't remove the gig because it's not yours");
     }
     const removedGig = await Gig.remove({ _id: req.params.id });
-    res.json(removedGig);
+    res.json("Deleted");
   } catch (error) {
     res.json({ message: error });
   }

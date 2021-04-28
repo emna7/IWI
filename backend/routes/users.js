@@ -27,7 +27,8 @@ usersRouter.get('/', async (req, res) => {
 
 usersRouter.get('/:id', async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    // const user = await User.findById(req.params.id).populate({ path: 'posts', select: 'content createdAt', populate: {path: 'createdIn', select: 'title'}, populate: {path: 'comments', select: 'content createdAt', populate: {path: 'createdBy', select: 'username'}}}).populate({ path: 'userClubs.createdClubs', select: 'title' });
+    const user = await User.findById(req.params.id)
     if (!user) {
       res.status(404).send('Cannot be found');
       return;
@@ -42,8 +43,10 @@ usersRouter.get('/:id', async (req, res) => {
 usersRouter.post('/signup', async (req, res) => {
   try {
     // SIGNUP INPUT DATA VALIDATION
-    const alreadyExist = await User.findOne({"email": req.body.email});
+    let alreadyExist = await User.findOne({"email": req.body.email});
     if (alreadyExist) return res.send('Email already exists');
+    alreadyExist = await User.findOne({"username": req.body.username});
+    if (alreadyExist) return res.send('username already exists');
     // hash password
     const salt = await bcrypt.genSalt(10);
     const hashpassword = await bcrypt.hash(req.body.password, salt);
@@ -53,8 +56,9 @@ usersRouter.post('/signup', async (req, res) => {
 
     // create a new user
     const user = new User(userData);
-    const savedUser = await user.save( (err) => console.log("ERROR", err));
-    res.send(savedUser);
+    const savedUser = await user.save();
+    // res.json(savedUser);
+    res.json("Successfully created a new user");
   } catch (error) {
     res.json({ message: error });
   }
@@ -83,7 +87,6 @@ usersRouter.post('/login', async (req, res) => {
       res.json({ message: error });
     });
   } catch (error) {
-  console.log('hani fil error');
   res.json({ message: error });
 }});
 
@@ -102,7 +105,7 @@ usersRouter.patch('/:id', auth, async (req, res) => {
       { _id: req.params.id },
       { $set: userData}
     );
-    res.send("user updated!");
+    res.send(user);
   } catch (error) {
     res.json({ message: error });
   }
@@ -148,7 +151,7 @@ usersRouter.delete('/:id', auth, async (req, res) => {
     if (!correctPassword) return res.send("wrong password");
 
     const removedUser = await User.remove({ _id: req.params.id });
-    res.json(removedUser);
+    res.json("Deleted");
   } catch (error) {
     res.json({ message: error });
   }

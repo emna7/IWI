@@ -158,7 +158,7 @@ postsRouter.delete('/:id', async (req, res) => {
     );
   }
     const removedPost = await Post.remove({ _id: req.params.id });
-    res.json(removedPost);
+    res.json("Deleted");
   } catch (error) {
     res.json({ message: error });
   }

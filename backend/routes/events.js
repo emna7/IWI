@@ -40,7 +40,7 @@ eventsRouter.post('/', auth, async (req, res) => {
       { _id: event.createdBy},
       {$push: {'userEvents.createdEvents': event._id}}
     );
-    res.send(savedEvent);
+    res.send("A new event is created");
   } catch (error) {
     res.json({ message: error });
   }
@@ -132,7 +132,7 @@ eventsRouter.post('/:id/participants/cancel', auth, async (req, res) => {
       {$pull: {'userEvents.participantInEvents': event._id}}
     );
 
-    res.send("you canceled your participation in this event");
+    res.send("Cancelation is done");
   } catch (error) {
     res.json({ message: error });
   }
@@ -204,7 +204,7 @@ eventsRouter.post('/:id/interested/cancel', auth, async (req, res) => {
       {$pull: {'userEvents.interestedInEvents': event._id}}
     );
 
-    res.send("you're no longer interested in this event");
+    res.send("Cancelation is done");
   } catch (error) {
     res.json({ message: error });
   }
@@ -221,7 +221,7 @@ eventsRouter.delete('/:id', async (req, res) => {
       return res.send("you can't remove the event because it's not yours");
     }
     const removedEvent = await Event.remove({ _id: req.params.id });
-    res.json(removedEvent);
+    res.json("Deleted");
   } catch (error) {
     res.json({ message: error });
   }

@@ -55,7 +55,7 @@ clubsRouter.post('/', auth, async (req, res) => {
       { _id: club.createdBy},
       {$push: {'userClubs.createdClubs': club._id}}
     );
-    res.send(savedClub);
+    res.send("A new club is created");
   } catch (error) {
     res.json({ message: error });
   }
@@ -136,7 +136,7 @@ clubsRouter.post('/:clubId/requests/refuse/:userId', auth, async (req, res) => {
       { _id: req.params.userId},
       {$pull: {'userClubs.pendingRequests': club._id}}
     );
-    res.send("You refused an applicant at your club!");
+    res.send("You refused a request to join your club!");
   } catch (error) {
     console.log("in error");
     res.json({ message: "error" });
@@ -183,7 +183,7 @@ clubsRouter.delete('/:id', auth, async (req, res) => {
     }
 
     const removedClub = await Club.remove({ _id: req.params.id });
-    res.json(removedClub);
+    res.json("Deleted");
   } catch (error) {
     res.json({ message: error });
   }
