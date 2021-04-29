@@ -15,14 +15,14 @@ const commentsRouter = require('./comments');
 
 postsRouter.use('/:postId/comments', commentsRouter);
 
-
+// Potential parents of a post: a post can be posted on a club or an event or a user profile
 const parents = {
   'clubId': Club,
   'userId': User,
   'eventId': Event
 }
 
-// a helper function
+// a helper function to find the parent of the post,
 const findParent = (parents, parameters) => {
   for (let p in parents) {
     if (p in parameters) return p;
@@ -30,6 +30,7 @@ const findParent = (parents, parameters) => {
 }
 // ---
 
+// GET ALL POSTS OF THAT PARENT
 postsRouter.get('/', async (req, res) => {
   try {
 
@@ -47,6 +48,7 @@ postsRouter.get('/', async (req, res) => {
   }
 });
 
+// GET A SPECIFIC POST
 postsRouter.get('/:id', async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
@@ -62,6 +64,7 @@ postsRouter.get('/:id', async (req, res) => {
   }
 });
 
+// CREATE A NEW POST
 postsRouter.post('/', auth, async (req, res) => {
   try {
 
@@ -71,6 +74,10 @@ postsRouter.post('/', auth, async (req, res) => {
       res.status(404).send('Cannot be found');
       return;
     }
+    // In order to create a new post,
+    // you should do it on your own profile
+    // or on a club that you are a member of/creator of,
+    // or on an event where you are either a participant or an interested person
     if (p == 'userId' && parent._id != req.user._id)
     {
       res.status(403).send('Permission Denied');
@@ -86,6 +93,7 @@ postsRouter.post('/', auth, async (req, res) => {
       res.status(403).send('Permission Denied');
       return;
     }
+
     const post = new Post({...req.body, createdBy: req.user._id, createdIn: parent._id});
     const savedPost = await post.save();
 
@@ -106,6 +114,7 @@ postsRouter.post('/', auth, async (req, res) => {
   }
 });
 
+// EDIT THE POST
 postsRouter.patch('/:id', auth, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
@@ -128,6 +137,7 @@ postsRouter.patch('/:id', auth, async (req, res) => {
   }
 });
 
+// DELETE THE POST
 postsRouter.delete('/:id', auth, async (req, res) => {
   try {
     const p = findParent(parents, req.params);
@@ -141,12 +151,15 @@ postsRouter.delete('/:id', auth, async (req, res) => {
       res.status(404).send('Cannot be found');
       return;
     }
+    // In order to delete a post, you should be either the owner of the post
+    // or the owner of the club/event in which the post was posted
     if (p == 'userId' && post.createdBy != req.user._id) {
       return res.status(403).send("you can't remove the post because it's not yours");
     }
     if ((p == 'clubId' || p == 'eventId') && post.createdBy != req.user._id && parent.createdBy != req.user._id) {
       return res.status(403).send("you can't remove the post because it's not yours");
     }
+
     let updatedUser = await User.updateOne(
       { _id: post.createdBy},
       {$pull: {'posts': post._id}}

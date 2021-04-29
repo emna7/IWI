@@ -16,6 +16,7 @@ const JWTR =  require('jwt-redis').default;
 const redisClient = redis.createClient();
 const jwtr = new JWTR(redisClient);
 
+// GET ALL USERS
 usersRouter.get('/', async (req, res) => {
   try {
     const users = await User.find();
@@ -24,7 +25,7 @@ usersRouter.get('/', async (req, res) => {
     res.status(500).json({ message: error, });
   }
 });
-
+// GET A SPECIFIC USER
 usersRouter.get('/:id', async (req, res) => {
   try {
     // const user = await User.findById(req.params.id).populate({ path: 'posts', select: 'content createdAt', populate: {path: 'createdIn', select: 'title'}, populate: {path: 'comments', select: 'content createdAt', populate: {path: 'createdBy', select: 'username'}}}).populate({ path: 'userClubs.createdClubs', select: 'title' });
@@ -39,7 +40,7 @@ usersRouter.get('/:id', async (req, res) => {
   }
   res.send(user);
 });
-
+// SIGNUP
 usersRouter.post('/signup', async (req, res) => {
   try {
     // SIGNUP INPUT DATA VALIDATION
@@ -64,6 +65,7 @@ usersRouter.post('/signup', async (req, res) => {
   }
 });
 
+// LOGIN
 usersRouter.post('/login', async (req, res) => {
   try {
     // LOGIN INPUT DATA VALIDATION
@@ -90,12 +92,15 @@ usersRouter.post('/login', async (req, res) => {
   res.status(500).json({ message: error });
 }});
 
+// EDIT A USER
 usersRouter.patch('/:id', auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.send("User already doesn't exist");
 
     if (req.user._id != user._id) return res.status(403).send("Access Denied");
+
+    // You musn't edit the user id or password
     let userData = {...req.body};
     if (userData.id) delete userData.id;
     if (userData._id) delete userData._id;
@@ -111,6 +116,7 @@ usersRouter.patch('/:id', auth, async (req, res) => {
   }
 });
 
+// RESET PASSWORD
 usersRouter.patch('/:id/reset_password', auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -118,12 +124,13 @@ usersRouter.patch('/:id/reset_password', auth, async (req, res) => {
 
     if (req.user._id != user._id) return res.status(403).send("Access Denied");
 
+    // Body must contain both of the old and new passwords
     if (!req.body.password) return res.status(400).send("Please enter the old password!");
     const correctPassword = await bcrypt.compare(req.body.password, user.password);
     if (!correctPassword) return res.status(403).send("wrong password");
-
     if (!req.body.new_password) return res.status(400).send("Please enter the new password!");
 
+    // Hashing the new password and saving it
     const salt = await bcrypt.genSalt(10);
     const hashpassword = await bcrypt.hash(req.body.new_password, salt);
 
@@ -137,6 +144,7 @@ usersRouter.patch('/:id/reset_password', auth, async (req, res) => {
   }
 });
 
+// DELETE A USER
 usersRouter.delete('/:id', auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -144,7 +152,7 @@ usersRouter.delete('/:id', auth, async (req, res) => {
     if (!user) return res.status(404).send("User already doesn't exist");
 
     if (req.user._id != user._id) return res.status(403).send("Access Denied");
-
+    // The user must re-enter their password
     if (!req.body.password) return res.status(400).send("Please enter your password");
 
     const correctPassword = await bcrypt.compare(req.body.password, user.password);
@@ -157,6 +165,7 @@ usersRouter.delete('/:id', auth, async (req, res) => {
   }
 });
 
+// LOGOUT
 usersRouter.post('/logout', auth, async (req, res) => {
   try {
     const destroyed = await jwtr.destroy(req.user.jti);

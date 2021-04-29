@@ -9,7 +9,7 @@ const postsRouter = require('./posts');
 
 clubsRouter.use('/:clubId/posts', postsRouter);
 
-// GENERAL
+// GET ALL CLUBS
 clubsRouter.get('/', async (req, res) => {
   try {
   const clubs = await Club.find();
@@ -18,7 +18,7 @@ clubsRouter.get('/', async (req, res) => {
     res.status(500).json({ message: error });
   }
 });
-
+// GET A SPECIFIC CLUB
 clubsRouter.get('/:id', async (req, res) => {
   try {
     const club = await Club.findById(req.params.id);
@@ -31,7 +31,7 @@ clubsRouter.get('/:id', async (req, res) => {
     res.status(500).json({ message: error });
   }
 });
-
+// GET ALL MEMBERS OF A CLUB
 clubsRouter.get('/:id/members', async (req, res) => {
   try {
     const club = await Club.findById(req.params.id);
@@ -45,7 +45,7 @@ clubsRouter.get('/:id/members', async (req, res) => {
   }
 });
 // ---------------
-// CREATOR OF THE CLUB
+// CREATOR OF THE CLUB - CREATE A NEW CLUB
 clubsRouter.post('/', auth, async (req, res) => {
   try {
     const club = new Club({...req.body, createdBy: req.user._id});
@@ -61,6 +61,7 @@ clubsRouter.post('/', auth, async (req, res) => {
   }
 });
 
+// EDIT THE CLUB
 clubsRouter.patch('/:id', auth, async (req, res) => {
   try {
     const club = await Club.findById(req.params.id);
@@ -81,6 +82,7 @@ clubsRouter.patch('/:id', auth, async (req, res) => {
     res.status(500).json({ message: error });
   }
 });
+
 // ACCEPT A PENDING REQUEST OF A USER
 clubsRouter.post('/:clubId/requests/accept/:userId', auth, async (req, res) => {
   try {
@@ -100,6 +102,7 @@ clubsRouter.post('/:clubId/requests/accept/:userId', auth, async (req, res) => {
     club.members.push(req.params.userId);
     const savedClub = await club.save();
 
+    // Send a notification to the accepted user
     const user = await User.findById(req.user._id)
     const acceptedUser = await User.findById(req.params.userId)
     const notif = {
@@ -176,6 +179,7 @@ clubsRouter.post('/:clubId/members/delete/:userId', auth, async (req, res) => {
   }
 });
 
+// DELETE THE CLUB
 clubsRouter.delete('/:id', auth, async (req, res) => {
   try {
     const club = await Club.findById(req.params.id);
@@ -186,6 +190,7 @@ clubsRouter.delete('/:id', auth, async (req, res) => {
     if (club.createdBy != req.user._id) {
       return res.status(403).send("you can't remove the club because it's not yours");
     }
+    // Delete id of the club from club creator, club members and users who sent a request to join the club
     let updatedCreator = await User.updateOne(
       { _id: req.user._id},
       {$pull: {'userClubs.createdClubs': club._id}}
@@ -202,6 +207,7 @@ clubsRouter.delete('/:id', auth, async (req, res) => {
         {$pull: {'userClubs.pendingRequests': club._id}}
       );
     }
+    // Deleting the club
     const removedClub = await Club.remove({ _id: req.params.id });
     res.json("Deleted");
   } catch (error) {
@@ -224,10 +230,11 @@ clubsRouter.post('/:id/join', auth, async (req, res) => {
     club.pendingRequests.push(req.user._id);
     const savedClub = await club.save();
 
+    // Send Notification to the club creator
     const owner = await User.findById(club.createdBy)
     const user = await User.findById(req.user._id)
     const notif = {
-      action: 'ClubMemberAcceptedRequest',
+      action: 'ClubRequestSent',
       links: [{content: user.username, id: req.user._id}, {content: club.title, id: club._id}],
       from: req.user._id,
       to: club.createdBy,
@@ -236,6 +243,7 @@ clubsRouter.post('/:id/join', auth, async (req, res) => {
       { _id: club.createdBy},
       {$push: {'notifications': notif}}
     );
+
     updateduser = await User.updateOne(
       { _id: req.user._id},
       {$push: {'userClubs.pendingRequests': club._id}}

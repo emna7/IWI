@@ -10,19 +10,23 @@ const auth = require('./auth');
 
 commentsRouter.use('/:commentId/reply', commentsRouter);
 
+// Potential parents of a comment: a comment can be writted on a post
+// or on a gig (as a review)
+// or on another comment (as a reply to that comment)
 const parents = {
   'commentId': Comment,
   'postId': Post,
   'gigId': Gig
 }
 
-// a helper function
+// a helper function to find the parent of the comment
 const findParent = (parents, parameters) => {
   for (let p in parents) {
     if (p in parameters) return p;
   }
 }
 // ---
+// GET ALL COMMENTS OF THAT PARENT
 commentsRouter.get('/', async (req, res) => {
   try {
 
@@ -39,6 +43,8 @@ commentsRouter.get('/', async (req, res) => {
     res.status(500).json({ message: error });
   }
 });
+
+// GET A SPECIFIC COMMENT
 commentsRouter.get('/:id', async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id)
@@ -54,6 +60,7 @@ commentsRouter.get('/:id', async (req, res) => {
   }
 });
 
+// CREATE A NEW COMMENT
 commentsRouter.post('/', auth, async (req, res) => {
   try {
 
@@ -78,6 +85,9 @@ commentsRouter.post('/', auth, async (req, res) => {
     const comment = new Comment({...req.body, createdBy: req.user._id, createdIn: parent._id});
     const savedPost = await comment.save();
 
+    // Send a notification to the user that you commented to
+    // if you commented on a post, then the post owner will be notified
+    // if you replied to a comment, then the comment owner will be notified
     const parentOwner = await User.findById(parent.createdBy)
     if ('commentId' in req.params) { const action = 'CommentReply'} else { const action = 'PostComment'}
     const notif = {
@@ -108,6 +118,7 @@ commentsRouter.post('/', auth, async (req, res) => {
   }
 });
 
+// EDIT YOUR COMMENT
 commentsRouter.patch('/:id', auth, async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id)
@@ -127,6 +138,10 @@ commentsRouter.patch('/:id', auth, async (req, res) => {
       res.status(404).send('Cannot be found');
       return;
     }
+
+    // Send a notification to the user that you commented to
+    // if you commented on a post, then the post owner will be notified
+    // if you replied to a comment, then the comment owner will be notified
     const user = await User.findById(req.user._id);
     const parentOwner = await User.findById(parent.createdBy);
 
@@ -152,6 +167,7 @@ commentsRouter.patch('/:id', auth, async (req, res) => {
   }
 });
 
+// DELETE A COMMENT
 commentsRouter.delete('/:id', auth, async (req, res) => {
   try {
     const p = findParent(parents, req.params);
@@ -166,7 +182,8 @@ commentsRouter.delete('/:id', auth, async (req, res) => {
       return;
     }
     const user = await User.findById(req.user._id);
-
+    // In order to delete a comment, you should be either the owner of the comment
+    // or the owner of the club/event in which the comment was written
     if (p != 'gigId' && comment.createdBy != req.user._id && (('clubId' in req.params && !user.userClubs.createdClubs.includes(req.params.clubId)) || ('eventId' in req.params && !user.userEvents.createdEvents.includes(req.params.eventId)))) {
       return res.status(403).send("you can't remove the comment because it's not yours");
     }

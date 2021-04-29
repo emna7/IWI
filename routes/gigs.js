@@ -124,6 +124,7 @@ gigsRouter.post('/:gigId/applicants/accept/:userId', auth, async (req, res) => {
     gig.acceptedApplicants.push(req.params.userId);
     const savedGig = await gig.save();
 
+    // Send a notification to the accepted applicant
     const user = await User.findById(req.user._id)
     const acceptedUser = await User.findById(req.params.userId)
     const notif = {
@@ -165,6 +166,7 @@ gigsRouter.post('/:gigId/applicants/refuse/:userId', auth, async (req, res) => {
     gig.applicants.splice(req.params.userId, 1)
     const savedGig = await gig.save();
 
+    // Send a notification to the refused applicant
     const user = await User.findById(req.user._id)
     const refusedUser = await User.findById(req.params.userId)
     const notif = {
@@ -177,6 +179,7 @@ gigsRouter.post('/:gigId/applicants/refuse/:userId', auth, async (req, res) => {
       { _id: req.params.userId},
       {$pull: {'userGigs.appliedToGigs': gig._id}, $push: {'notifications': notif}}
     );
+
     res.send("You refused an applicant at your gig!");
   } catch (error) {
     res.status(500).json({ message: "error" });
@@ -263,6 +266,7 @@ gigsRouter.post('/:id/apply', auth, async (req, res) => {
     gig.applicants.push(req.user._id);
     const savedGig = await gig.save();
 
+    // Send a notification to the gig creator
     const owner = await User.findById(gig.createdBy)
     const user = await User.findById(req.user._id)
     const notif = {

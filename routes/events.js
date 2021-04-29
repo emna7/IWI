@@ -10,6 +10,7 @@ const postsRouter = require('./posts');
 
 eventsRouter.use('/:eventId/posts', postsRouter);
 
+// GET ALL EVENTS
 eventsRouter.get('/', async (req, res) => {
   try {
   const events = await Event.find();
@@ -19,6 +20,7 @@ eventsRouter.get('/', async (req, res) => {
   }
 });
 
+// GET A SPECIFIC EVENT
 eventsRouter.get('/:id', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
@@ -32,6 +34,7 @@ eventsRouter.get('/:id', async (req, res) => {
   }
 });
 
+// CREATE A NEW EVENT
 eventsRouter.post('/', auth, async (req, res) => {
   try {
     const event = new Event({...req.body, createdBy: req.user._id});
@@ -46,6 +49,7 @@ eventsRouter.post('/', auth, async (req, res) => {
   }
 });
 
+// EDIT THE EVENT
 eventsRouter.patch('/:id', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
@@ -66,6 +70,7 @@ eventsRouter.patch('/:id', auth, async (req, res) => {
   }
 });
 
+// GET ALL PARTICIPANTS IN AN EVENT
 eventsRouter.get('/:id/participants', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
@@ -79,6 +84,7 @@ eventsRouter.get('/:id/participants', async (req, res) => {
   }
 });
 
+// PARTICIPATE IN AN EVENT
 eventsRouter.post('/:id/participants', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
@@ -98,6 +104,7 @@ eventsRouter.post('/:id/participants', auth, async (req, res) => {
       {$push: {'userEvents.participantInEvents': event._id}}
     );
 
+    // Send a notification to the event owner
     const notif = {
       action: 'EventParticipant',
       links: [{content: user.username, id: req.user._id}, {content: event.title, id: event._id}],
@@ -127,6 +134,7 @@ eventsRouter.post('/:id/participants', auth, async (req, res) => {
   }
 });
 
+// CANCEL YOUR PARTICIPATION IN AN EVENT
 eventsRouter.post('/:id/participants/cancel', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
@@ -153,6 +161,7 @@ eventsRouter.post('/:id/participants/cancel', auth, async (req, res) => {
   }
 });
 
+// GET ALL INTERESTED USERS IN AN EVENT
 eventsRouter.get('/:id/interested', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
@@ -166,6 +175,7 @@ eventsRouter.get('/:id/interested', async (req, res) => {
   }
 });
 
+// BECOME INTERESTED IN AN EVENT
 eventsRouter.post('/:id/interested', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
@@ -185,6 +195,7 @@ eventsRouter.post('/:id/interested', auth, async (req, res) => {
       {$push: {'userEvents.interestedInEvents': event._id}}
     );
 
+    // Send a notification to the event owner
     const notif = {
       action: 'EventInterested',
       links: [{content: user.username, id: req.user._id}, {content: event.title, id: event._id}],
@@ -214,6 +225,7 @@ eventsRouter.post('/:id/interested', auth, async (req, res) => {
   }
 });
 
+// CANCEL YOUR INTEREST IN AN EVENT
 eventsRouter.post('/:id/interested/cancel', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
@@ -241,6 +253,7 @@ eventsRouter.post('/:id/interested/cancel', auth, async (req, res) => {
   }
 });
 
+// DELETE AN EVENT
 eventsRouter.delete('/:id', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
