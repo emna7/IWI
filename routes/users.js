@@ -21,7 +21,7 @@ usersRouter.get('/', async (req, res) => {
     const users = await User.find();
     res.json(users);
   } catch (error) {
-    res.json({ message: error, });
+    res.status(500).json({ message: error, });
   }
 });
 
@@ -35,7 +35,7 @@ usersRouter.get('/:id', async (req, res) => {
     }
     res.send(user);
   } catch (error) {
-    res.json({ message: error, });
+    res.status(500).json({ message: error, });
   }
   res.send(user);
 });
@@ -60,7 +60,7 @@ usersRouter.post('/signup', async (req, res) => {
     // res.json(savedUser);
     res.json("Successfully created a new user");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -87,7 +87,7 @@ usersRouter.post('/login', async (req, res) => {
       res.json({ message: error });
     });
   } catch (error) {
-  res.json({ message: error });
+  res.status(500).json({ message: error });
 }});
 
 usersRouter.patch('/:id', auth, async (req, res) => {
@@ -95,7 +95,7 @@ usersRouter.patch('/:id', auth, async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.send("User already doesn't exist");
 
-    if (req.user._id != user._id) return res.send("Access Denied");
+    if (req.user._id != user._id) return res.status(403).send("Access Denied");
     let userData = {...req.body};
     if (userData.id) delete userData.id;
     if (userData._id) delete userData._id;
@@ -107,22 +107,22 @@ usersRouter.patch('/:id', auth, async (req, res) => {
     );
     res.send(user);
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
 usersRouter.patch('/:id/reset_password', auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) return res.send("User already doesn't exist");
+    if (!user) return res.status(404).send("User already doesn't exist");
 
-    if (req.user._id != user._id) return res.send("Access Denied");
+    if (req.user._id != user._id) return res.status(403).send("Access Denied");
 
-    if (!req.body.password) return res.send("Please enter the old password!");
+    if (!req.body.password) return res.status(400).send("Please enter the old password!");
     const correctPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!correctPassword) return res.send("wrong password");
+    if (!correctPassword) return res.status(403).send("wrong password");
 
-    if (!req.body.new_password) return res.send("Please enter the new password!");
+    if (!req.body.new_password) return res.status(400).send("Please enter the new password!");
 
     const salt = await bcrypt.genSalt(10);
     const hashpassword = await bcrypt.hash(req.body.new_password, salt);
@@ -133,7 +133,7 @@ usersRouter.patch('/:id/reset_password', auth, async (req, res) => {
     );
     res.send("user updated!");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -141,19 +141,19 @@ usersRouter.delete('/:id', auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
 
-    if (!user) return res.send("User already doesn't exist");
+    if (!user) return res.status(404).send("User already doesn't exist");
 
-    if (req.user._id != user._id) return res.send("Access Denied");
+    if (req.user._id != user._id) return res.status(403).send("Access Denied");
 
-    if (!req.body.password) return res.send("Please enter your password");
+    if (!req.body.password) return res.status(400).send("Please enter your password");
 
     const correctPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!correctPassword) return res.send("wrong password");
+    if (!correctPassword) return res.status(403).send("wrong password");
 
     const removedUser = await User.remove({ _id: req.params.id });
     res.json("Deleted");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -164,7 +164,7 @@ usersRouter.post('/logout', auth, async (req, res) => {
     console.log("logged out!", destroyed);
     res.json("logged out!");
   } catch (error) {
-    res.json({ message: error, });
+    res.status(500).json({ message: error, });
   }
 });
 

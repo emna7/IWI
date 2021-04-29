@@ -19,7 +19,7 @@ gigsRouter.get('/', async (req, res) => {
   const gigs = await Gig.find();
   res.json(gigs)
 } catch (error) {
-  res.json({ message: error });
+  res.status(500).json({ message: error });
 }
 });
 
@@ -33,7 +33,7 @@ gigsRouter.get('/:id', async (req, res) => {
     }
     res.send(gig);
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -59,7 +59,7 @@ gigsRouter.post('/', auth, async (req, res) => {
     res.send("A new gig is created");
   } catch (error) {
     console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 
@@ -80,7 +80,7 @@ gigsRouter.patch('/:id', auth, async (req, res) => {
     );
     res.json(gig);
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -101,7 +101,7 @@ gigsRouter.get('/:id/candidates', auth, async (req, res) => {
     });
   } catch (error) {
     console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 
@@ -143,8 +143,7 @@ gigsRouter.post('/:gigId/applicants/accept/:userId', auth, async (req, res) => {
 
     res.send("You accepted an applicant at your gig!");
   } catch (error) {
-    console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 
@@ -180,8 +179,7 @@ gigsRouter.post('/:gigId/applicants/refuse/:userId', auth, async (req, res) => {
     );
     res.send("You refused an applicant at your gig!");
   } catch (error) {
-    console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 
@@ -208,7 +206,7 @@ gigsRouter.patch('/:id/close', auth, async (req, res) => {
     );
     res.json(gig);
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -236,7 +234,7 @@ gigsRouter.delete('/:id', async (req, res) => {
     const removedGig = await Gig.remove({ _id: req.params.id });
     res.json("Deleted");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -283,8 +281,7 @@ gigsRouter.post('/:id/apply', auth, async (req, res) => {
     );
     res.send("You applied to the gig!");
   } catch (error) {
-    console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 
@@ -306,8 +303,7 @@ gigsRouter.post('/:id/cancel', auth, async (req, res) => {
     );
     res.send("Cancelation is done");
   } catch (error) {
-    console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 // GIG APPLICANT JOURNEY ------------------END

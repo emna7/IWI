@@ -43,7 +43,7 @@ postsRouter.get('/', async (req, res) => {
     res.json(parent.posts);
 
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -58,7 +58,7 @@ postsRouter.get('/:id', async (req, res) => {
     res.json(post);
 
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -73,17 +73,17 @@ postsRouter.post('/', auth, async (req, res) => {
     }
     if (p == 'userId' && parent._id != req.user._id)
     {
-      res.status(404).send('Permission Denied');
+      res.status(403).send('Permission Denied');
       return;
     }
     if (p == 'clubId' && parent.createdBy != req.user._id && !parent.members.includes(req.user._id))
     {
-      res.status(404).send('Permission Denied');
+      res.status(403).send('Permission Denied');
       return;
     }
     if (p == 'eventId' && parent.createdBy != req.user._id && !parent.participants.includes(req.user._id) && !parent.interested.includes(req.user._id))
     {
-      res.status(404).send('Permission Denied');
+      res.status(403).send('Permission Denied');
       return;
     }
     const post = new Post({...req.body, createdBy: req.user._id, createdIn: parent._id});
@@ -102,7 +102,7 @@ postsRouter.post('/', auth, async (req, res) => {
     res.json(parent.posts);
 
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -115,7 +115,7 @@ postsRouter.patch('/:id', auth, async (req, res) => {
       return;
     }
     if (post.createdBy != req.user._id) {
-      return res.send("you can't edit the post because it's not yours");
+      return res.status(403).send("you can't edit the post because it's not yours");
     }
     const updatedPost = await Post.updateOne(
       { _id: req.params.id },
@@ -124,11 +124,11 @@ postsRouter.patch('/:id', auth, async (req, res) => {
     res.json(post);
 
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
-postsRouter.delete('/:id', async (req, res) => {
+postsRouter.delete('/:id', auth, async (req, res) => {
   try {
     const p = findParent(parents, req.params);
     const parent = await parents[p].findById(req.params[p])
@@ -142,10 +142,10 @@ postsRouter.delete('/:id', async (req, res) => {
       return;
     }
     if (p == 'userId' && post.createdBy != req.user._id) {
-      return res.send("you can't remove the post because it's not yours");
+      return res.status(403).send("you can't remove the post because it's not yours");
     }
     if ((p == 'clubId' || p == 'eventId') && post.createdBy != req.user._id && parent.createdBy != req.user._id) {
-      return res.send("you can't remove the post because it's not yours");
+      return res.status(403).send("you can't remove the post because it's not yours");
     }
     let updatedUser = await User.updateOne(
       { _id: post.createdBy},
@@ -160,7 +160,7 @@ postsRouter.delete('/:id', async (req, res) => {
     const removedPost = await Post.remove({ _id: req.params.id });
     res.json("Deleted");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 

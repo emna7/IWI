@@ -15,7 +15,7 @@ eventsRouter.get('/', async (req, res) => {
   const events = await Event.find();
   res.json(events)
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -28,7 +28,7 @@ eventsRouter.get('/:id', async (req, res) => {
     }
     res.send(event);
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -42,11 +42,11 @@ eventsRouter.post('/', auth, async (req, res) => {
     );
     res.send("A new event is created");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
-eventsRouter.patch('/:id', async (req, res) => {
+eventsRouter.patch('/:id', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) {
@@ -54,7 +54,7 @@ eventsRouter.patch('/:id', async (req, res) => {
       return;
     }
     if (event.createdBy != req.user._id) {
-      return res.send("you can't edit the event because it's not yours");
+      return res.status(403).send("you can't edit the event because it's not yours");
     }
     const updatedEvent = await Event.updateOne(
       { _id: req.params.id },
@@ -62,7 +62,7 @@ eventsRouter.patch('/:id', async (req, res) => {
     );
     res.json(event);
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -75,7 +75,7 @@ eventsRouter.get('/:id/participants', async (req, res) => {
     }
     res.send(event.participants);
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -123,7 +123,7 @@ eventsRouter.post('/:id/participants', auth, async (req, res) => {
     }
     res.send("you participate in this event");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -134,7 +134,10 @@ eventsRouter.post('/:id/participants/cancel', auth, async (req, res) => {
       res.status(404).send('Cannot be found');
       return;
     }
-
+    if (!event.participants.includes(req.user._id)) {
+      res.status(404).send('Cannot be found');
+      return;
+    }
     let updatedEvent = await Event.updateOne(
       { _id: req.params.id},
       {$pull: {'participants': req.user._id}}
@@ -146,7 +149,7 @@ eventsRouter.post('/:id/participants/cancel', auth, async (req, res) => {
 
     res.send("Cancelation is done");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -159,7 +162,7 @@ eventsRouter.get('/:id/interested', async (req, res) => {
     }
     res.send(event.interested);
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -207,7 +210,7 @@ eventsRouter.post('/:id/interested', auth, async (req, res) => {
     }
     res.send("you are interested in this event");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -215,6 +218,10 @@ eventsRouter.post('/:id/interested/cancel', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) {
+      res.status(404).send('Cannot be found');
+      return;
+    }
+    if (!event.interested.includes(req.user._id)) {
       res.status(404).send('Cannot be found');
       return;
     }
@@ -230,11 +237,11 @@ eventsRouter.post('/:id/interested/cancel', auth, async (req, res) => {
 
     res.send("Cancelation is done");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
-eventsRouter.delete('/:id', async (req, res) => {
+eventsRouter.delete('/:id', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) {
@@ -263,7 +270,7 @@ eventsRouter.delete('/:id', async (req, res) => {
     const removedEvent = await Event.remove({ _id: req.params.id });
     res.json("Deleted");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 

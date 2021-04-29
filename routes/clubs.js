@@ -15,7 +15,7 @@ clubsRouter.get('/', async (req, res) => {
   const clubs = await Club.find();
   res.json(clubs)
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -28,7 +28,7 @@ clubsRouter.get('/:id', async (req, res) => {
     }
     res.send(club);
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -41,7 +41,7 @@ clubsRouter.get('/:id/members', async (req, res) => {
     }
     res.send(club.members);
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 // ---------------
@@ -57,7 +57,7 @@ clubsRouter.post('/', auth, async (req, res) => {
     );
     res.send("A new club is created");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -69,7 +69,7 @@ clubsRouter.patch('/:id', auth, async (req, res) => {
       return;
     }
     if (club.createdBy != req.user._id) {
-      return res.send("you can't edit the club because it's not yours");
+      return res.status(403).send("you can't edit the club because it's not yours");
     }
     const updatedClub = await Club.updateOne(
       { _id: req.params.id },
@@ -78,7 +78,7 @@ clubsRouter.patch('/:id', auth, async (req, res) => {
     res.json(club);
 
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 // ACCEPT A PENDING REQUEST OF A USER
@@ -94,7 +94,7 @@ clubsRouter.post('/:clubId/requests/accept/:userId', auth, async (req, res) => {
       return;
     }
     if (club.createdBy != req.user._id)
-    return res.send("Access Denied");
+    return res.status(403).send("Access Denied");
 
     club.pendingRequests.splice(req.params.userId, 1);
     club.members.push(req.params.userId);
@@ -118,8 +118,7 @@ clubsRouter.post('/:clubId/requests/accept/:userId', auth, async (req, res) => {
     // );
     res.send("You accepted a new member at your club!");
   } catch (error) {
-    console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 
@@ -132,7 +131,7 @@ clubsRouter.post('/:clubId/requests/refuse/:userId', auth, async (req, res) => {
       return;
     }
     if (club.createdBy != req.user._id)
-    return res.send("Access Denied");
+    return res.status(403).send("Access Denied");
 
     if (!club.pendingRequests.includes(req.params.userId)) {
       res.status(404).send('Cannot be found');
@@ -146,8 +145,7 @@ clubsRouter.post('/:clubId/requests/refuse/:userId', auth, async (req, res) => {
     );
     res.send("You refused a request to join your club!");
   } catch (error) {
-    console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 
@@ -160,7 +158,7 @@ clubsRouter.post('/:clubId/members/delete/:userId', auth, async (req, res) => {
       return;
     }
     if (club.createdBy != req.user._id)
-    return res.send("Access Denied");
+    return res.status(403).send("Access Denied");
 
     if (!club.members.includes(req.params.userId)) {
       res.status(404).send('Cannot be found');
@@ -174,8 +172,7 @@ clubsRouter.post('/:clubId/members/delete/:userId', auth, async (req, res) => {
     );
     res.send("You deleted a member from your club!");
   } catch (error) {
-    console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 
@@ -187,7 +184,7 @@ clubsRouter.delete('/:id', auth, async (req, res) => {
       return;
     }
     if (club.createdBy != req.user._id) {
-      return res.send("you can't remove the club because it's not yours");
+      return res.status(403).send("you can't remove the club because it's not yours");
     }
     let updatedCreator = await User.updateOne(
       { _id: req.user._id},
@@ -208,7 +205,7 @@ clubsRouter.delete('/:id', auth, async (req, res) => {
     const removedClub = await Club.remove({ _id: req.params.id });
     res.json("Deleted");
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 // ----------------
@@ -222,7 +219,7 @@ clubsRouter.post('/:id/join', auth, async (req, res) => {
       return;
     }
     if (club.createdBy == req.user._id)
-    return res.send("you are already the owner of this club!");
+    return res.status(403).send("you are already the owner of this club!");
 
     club.pendingRequests.push(req.user._id);
     const savedClub = await club.save();
@@ -245,8 +242,7 @@ clubsRouter.post('/:id/join', auth, async (req, res) => {
     );
     res.send("You sent a request to join the club!");
   } catch (error) {
-    console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 
@@ -272,7 +268,7 @@ clubsRouter.post('/:id/cancel', auth, async (req, res) => {
     res.send("Cancelation is done");
   } catch (error) {
     console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 
@@ -297,8 +293,7 @@ clubsRouter.post('/:id/leave', auth, async (req, res) => {
     );
     res.send("You left the club!");
   } catch (error) {
-    console.log("in error");
-    res.json({ message: "error" });
+    res.status(500).json({ message: "error" });
   }
 });
 // ----------------
