@@ -192,7 +192,7 @@ eventsRouter.post('/:id/interested', auth, async (req, res) => {
       { _id: owner._id},
       {$push: {'notifications': notif}}
     );
-    
+
     if (event.participants.includes(req.user._id)) {
       let updatedEvent = await Event.updateOne(
         { _id: req.params.id},
@@ -243,6 +243,22 @@ eventsRouter.delete('/:id', async (req, res) => {
     }
     if (event.createdBy != req.user._id) {
       return res.send("you can't remove the event because it's not yours");
+    }
+    let updatedCreator = await User.updateOne(
+      { _id: req.user._id},
+      {$pull: {'userEvents.createdEvents': event._id}}
+    );
+    for (let i = 0; i < event.participants.length; i++) {
+      let updatedParticipant = await User.updateOne(
+        { _id: event.participants[i]},
+        {$pull: {'userEvents.participantInEvents': event._id}}
+      );
+    }
+    for (let i = 0; i < event.interested.length; i++) {
+      let updatedInterested = await User.updateOne(
+        { _id: event.interested[i]},
+        {$pull: {'userEvents.interested': event._id}}
+      );
     }
     const removedEvent = await Event.remove({ _id: req.params.id });
     res.json("Deleted");

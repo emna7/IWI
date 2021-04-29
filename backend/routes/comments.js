@@ -78,6 +78,15 @@ commentsRouter.post('/', auth, async (req, res) => {
     const comment = new Comment({...req.body, createdBy: req.user._id, createdIn: parent._id});
     const savedPost = await comment.save();
 
+    const parentOwner = await User.findById(parent.createdBy)
+    if ('commentId' in req.params) { const action = 'CommentReply'} else { const action = 'PostComment'}
+    const notif = {
+      action: action,
+      links: [{content: user.username, id: req.user._id}, {content: comment.content, id: comment._id}, {content: parent.content, id: parent._id}],
+      from: req.user._id,
+      to: parentOwner._id,
+    }
+
     let updatedUser = await User.updateOne(
       { _id: comment.createdBy},
       {$push: {'comments': comment._id}}
@@ -86,6 +95,12 @@ commentsRouter.post('/', auth, async (req, res) => {
       { _id: comment.createdIn},
       {$push: {'comments': comment._id}}
     );
+
+    updatedUser = await User.updateOne(
+      { _id: parent.createdBy},
+      {$push: {'notifications': notif}}
+    );
+
     res.json(parent.comments);
 
   } catch (error) {
@@ -101,12 +116,34 @@ commentsRouter.patch('/:id', auth, async (req, res) => {
       res.status(404).send('Cannot be found');
       return;
     }
+
     if (comment.createdBy != req.user._id) {
       return res.send("you can't edit the comment because it's not yours");
+    }
+
+    const p = findParent(parents, req.params);
+    const parent = await parents[p].findById(req.params[p])
+    if (!parent) {
+      res.status(404).send('Cannot be found');
+      return;
+    }
+    const user = await User.findById(req.user._id);
+    const parentOwner = await User.findById(parent.createdBy);
+
+    if ('commentId' in req.params) { const action = 'CommentReplyEdit'} else { const action = 'PostCommentEdit'}
+    const notif = {
+      action: action,
+      links: [{content: user.username, id: req.user._id}, {content: comment.content, id: comment._id}, {content: parent.content, id: parent._id}],
+      from: req.user._id,
+      to: parentOwner._id,
     }
     const updatedComment = await Comment.updateOne(
       { _id: req.params.id },
       { $set: {...req.body}}
+    );
+    const updatedUser = await User.updateOne(
+      { _id: parent.createdBy},
+      {$push: {'notifications': notif}}
     );
     res.json(comment);
 

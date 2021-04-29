@@ -189,7 +189,22 @@ clubsRouter.delete('/:id', auth, async (req, res) => {
     if (club.createdBy != req.user._id) {
       return res.send("you can't remove the club because it's not yours");
     }
-
+    let updatedCreator = await User.updateOne(
+      { _id: req.user._id},
+      {$pull: {'userClubs.createdClubs': club._id}}
+    );
+    for (let i = 0; i < club.members.length; i++) {
+      let updatedMember = await User.updateOne(
+        { _id: club.members[i]},
+        {$pull: {'userClubs.joinedClubs': club._id}}
+      );
+    }
+    for (let i = 0; i < club.pendingRequests.length; i++) {
+      let updatedMember = await User.updateOne(
+        { _id: club.members[i]},
+        {$pull: {'userClubs.pendingRequests': club._id}}
+      );
+    }
     const removedClub = await Club.remove({ _id: req.params.id });
     res.json("Deleted");
   } catch (error) {
