@@ -72,7 +72,7 @@ gigsRouter.patch('/:id', auth, async (req, res) => {
       return;
     }
     if (gig.createdBy != req.user._id) {
-      return res.send("you can't edit the gig because it's not yours");
+      return res.status(403).send("you can't edit the gig because it's not yours");
     }
     const updatedGig = await Gig.updateOne(
       { _id: req.params.id },
@@ -114,7 +114,7 @@ gigsRouter.post('/:gigId/applicants/accept/:userId', auth, async (req, res) => {
       return;
     }
     if (gig.createdBy != req.user._id)
-    return res.send("Access Denied");
+    return res.status(403).send("Access Denied");
 
     if (!gig.applicants.includes(req.params.userId)) {
       res.status(404).send('Cannot be found');
@@ -157,7 +157,7 @@ gigsRouter.post('/:gigId/applicants/refuse/:userId', auth, async (req, res) => {
       return;
     }
     if (gig.createdBy != req.user._id)
-    return res.send("Access Denied");
+    return res.status(403).send("Access Denied");
 
     if (!gig.applicants.includes(req.params.userId)) {
       res.status(404).send('Cannot be found');
@@ -194,7 +194,7 @@ gigsRouter.patch('/:id/close', auth, async (req, res) => {
       return;
     }
     if (gig.createdBy != req.user._id) {
-      return res.send("you can't close or reopen the gig because it's not yours");
+      return res.status(403).send("you can't close or reopen the gig because it's not yours");
     }
 
     let closeGig = {"closed": !(gig.closed)}
@@ -257,10 +257,10 @@ gigsRouter.post('/:id/apply', auth, async (req, res) => {
       return;
     }
     if (gig.createdBy == req.user._id)
-    return res.send("you can't apply to your own gig!");
+    return res.status(403).send("you can't apply to your own gig!");
 
     if (gig.closed)
-    return res.send("you can't apply to a closed gig!");
+    return res.status(403).send("you can't apply to a closed gig!");
 
     gig.applicants.push(req.user._id);
     const savedGig = await gig.save();
@@ -297,7 +297,7 @@ gigsRouter.post('/:id/cancel', auth, async (req, res) => {
       return;
     }
     if (gig.createdBy == req.user._id)
-    return res.send("you can't cancel application to your own gig!");
+    return res.status(403).send("you can't cancel application to your own gig!");
     gig.applicants.splice(req.user._id, 1);
     const savedGig = await gig.save();
     let updateduser = await User.updateOne(
