@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "dotenv": "^8.2.0",
@@ -25,6 +26,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.4",
+    "react-router-dom": "^5.2.0",
     "redis": "^3.1.2",
     "redux": "^4.1.0"
   },
