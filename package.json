@@ -15,6 +15,7 @@
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "css-loader": "^5.2.4",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "gridfs-stream": "^1.1.1",
@@ -28,7 +29,8 @@
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.2.0",
     "redis": "^3.1.2",
-    "redux": "^4.1.0"
+    "redux": "^4.1.0",
+    "style-loader": "^2.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.16",
