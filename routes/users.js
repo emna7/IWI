@@ -40,14 +40,27 @@ usersRouter.get('/:id', async (req, res) => {
   }
   res.send(user);
 });
+
 // SIGNUP
 usersRouter.post('/signup', async (req, res) => {
   try {
     // SIGNUP INPUT DATA VALIDATION
     let alreadyExist = await User.findOne({"email": req.body.email});
-    if (alreadyExist) return res.send('Email already exists');
+    if (alreadyExist) {
+      return res.status(409).json({
+        success: false,
+        status: 'error',
+        message: 'Email already used',
+      });
+    }
     alreadyExist = await User.findOne({"username": req.body.username});
-    if (alreadyExist) return res.send('username already exists');
+    if (alreadyExist) {
+      return res.status(409).json({
+        success: false,
+        status: 'error',
+        message: 'username already used',
+      });
+    }
     // hash password
     const salt = await bcrypt.genSalt(10);
     const hashpassword = await bcrypt.hash(req.body.password, salt);
@@ -59,9 +72,16 @@ usersRouter.post('/signup', async (req, res) => {
     const user = new User(userData);
     const savedUser = await user.save();
     // res.json(savedUser);
-    res.json("Successfully created a new user");
+    res.status(201).json({
+      success: true,
+      message: "Account successfully created",
+    });
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({
+      success: true,
+      status: 'error',
+      message: error,
+    });
   }
 });
 
@@ -73,10 +93,10 @@ usersRouter.post('/login', async (req, res) => {
     const user = await User.findOne({"email": req.body.email});
     console.log(`req`);
     console.log(req.body);
-    if (!user) return res.send('Email not found');
+    if (!user) return res.status(404).json({ status: 'error', message: 'Email not found' });
     // Check Password
     const correctPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!correctPassword) return res.send("wrong password");
+    if (!correctPassword) return res.status(404).json({ status: 'error', message: "wrong password" });
     jwtr.sign(
       {"_id": user._id},
       process.env.SECRET_TOKEN
@@ -86,10 +106,10 @@ usersRouter.post('/login', async (req, res) => {
       res.json({ token: token });
     }).catch((error) => {
       console.log(`error = ${error}`);
-      res.json({ message: error });
+      res.json({ status: 'error', message: error });
     });
   } catch (error) {
-  res.status(500).json({ message: error });
+  res.status(500).json({ status: 'error', message: error });
 }});
 
 // EDIT A USER

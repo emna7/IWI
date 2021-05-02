@@ -2,12 +2,21 @@ const mongoose = require("mongoose")
 const Notification = require("./notificationModel")
 
 const userschema = mongoose.Schema({
-	firstName: String,
-	lastName: String,
+	firstName: {
+    type: String,
+    required: true,
+    default: '',
+  },
+	lastName: {
+    type: String,
+    required: true,
+    default: '',
+  },
   username: {
     type: String,
 		unique: true,
-		required: true
+		required: true,
+    default: '',
   },
   email: {
     type: String,
