@@ -1,5 +1,5 @@
 import './App.css';
-import { Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Event from './components/event/Event.js';
 import GigInterface from './components/gig/GigInterface.js';
 import Club from './components/club/Club.js';
@@ -22,9 +22,12 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
+      <Router>
+        <Link color="inherit" to="https://material-ui.com/">
+          Your Website
+        </Link>
+      </Router>
+      {' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -89,9 +92,12 @@ function App() {
   const classes = useStyles();
   return (
     <div className="App">
-      {/* <Route exact path ="/Club" Component={Club}/>
-      <Route exact path ="/Event" Component={Event}/> */}
       
+      <Router>
+        <Route exact path ="/Club" Component={Club}/>
+        <Route exact path ="/Event" Component={Event}/>
+      </Router>
+
       <React.Fragment>
       <CssBaseline />
       <AppBar position="relative">
@@ -132,8 +138,8 @@ function App() {
         <Container className={classes.cardGrid} maxWidth="md">
           {/* End hero unit */}
           <Grid container spacing={4}>
-            {cards.map((card) => (
-              <Grid item key={card} xs={12} sm={6} md={4}>
+            {cards.map((card, i) => (
+              <Grid item key={i} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
                   <CardMedia
                     className={classes.cardMedia}

@@ -12,6 +12,10 @@ module.exports = {
   },
 	devServer: {
 		hot: true,
+		inline: true,
+		watchOptions: {
+			poll: true,
+		},
 		contentBase: path.resolve(__dirname, 'dist'),
 	},
 	plugins: [
