@@ -10,6 +10,9 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import axios from 'axios';
+import { useSelector, useDispatch, } from 'react-redux';
+import { login, } from '../../redux/actions/userActions';
+import { getFromStorage, setInStorage, } from '../../utils/storage';
 
 const Login = () => {
 	
@@ -32,15 +35,16 @@ const Login = () => {
 	};
 
 	// JS
+	const dispatch = useDispatch();
 	const [currentState, setState] = useState({
 		isLoading: false,
-		loginError: '',
+		loginMsg: '',
 		email: '',
 		password: '',
+		rememberMe: false,
 	});
 
 	const handleInputChange = (e) => {
-		console.log('event --> ', e);
 		const {name, value} = e.target;
 		setState({
 			...currentState,
@@ -48,9 +52,19 @@ const Login = () => {
 		});
 	};
 
+	const handleCheckboxChange = (e) => {
+		const { name, checked } = e.target;
+		setState({
+			...currentState,
+			[name]: checked,
+		});
+	};
+
 	const onLogin = async () => {
-		const {email, password, loginError} = currentState;
-		
+		const { email, password, } = currentState;
+
+		let result; // contains the api call result
+
 		setState({
 			...currentState,
 			isLoading: true,
@@ -65,19 +79,31 @@ const Login = () => {
 			},
 		)
 		.then((res) => {
-			console.log(res);
+			const { data, } = res;
+			// console.log(data);
+			result = data;
 		})
 		.catch((err) => {
 			console.log(err);
 		});
 
-		setState({
-			...currentState,
-			isLoading: false,
-		});
+		if (result.status === 'error') {
+			setState({
+				...currentState,
+				isLoading: false,
+				loginMsg: result.message,
+			});
+		} else {
+			setInStorage('iwiToken', result.token);
+			dispatch(login(result.user));
+			setState({
+				email: '',
+				password: '',
+				isLoading: false,
+				loginMsg: '',
+			});
+		}
 	};
-
-	console.log(process.env);
 
 	return(
 		<Grid>
@@ -105,18 +131,28 @@ const Login = () => {
 				/>
 				<FormControlLabel
 					control={
-					<Checkbox
-						name="checkedB"
-						color="primary"
-					/>
+						<Checkbox
+							name="rememberMe"
+							color="primary"
+							onChange={(e) => handleCheckboxChange(e)}
+						/>
 					}
 					label="Remember me"
 				/>
-				<Button onClick={(e) => onLogin()} type='submit' color='primary' variant="Contained" style={btnstyle} fullWidth>sign in</Button>
+				<Button
+					onClick={(e) => onLogin()}
+					type='submit'
+					color='primary'
+					variant="Contained"
+					style={btnstyle}
+					fullWidth
+				>
+					Sign In
+				</Button>
 				<Typography> 
-					<Link href="#" >
+					<Link to="/" >
     				Forgot Password?
-  					</Link>
+  				</Link>
   				</Typography>
   				<Typography> Don't have an account ?
 					<Link to='/signup' >

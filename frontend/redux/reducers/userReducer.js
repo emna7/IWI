@@ -1,27 +1,17 @@
 import { ActionTypes } from '../constants/action-types';
 
-const initState = {
-  currentUser: null,
-};
+const initState = null;
 
 export const userReducer = (state = initState, {type, payload}) => {
   switch (type) {
     case ActionTypes.LOGIN:
-      return {
-        currentUser: payload,
-      };
+      return payload;
     case ActionTypes.LOGOUT:
-      return {
-        currentUser: null,
-      };
+      return null;
     case ActionTypes.UPDATE_ACCOUNT:
-      return {
-        currentUser: payload,
-      };
+      return payload;
     case ActionTypes.DELETE_ACCOUNT:
-      return {
-        currentUser: null,
-      };
+      return null;
     default:
       return state;
   };

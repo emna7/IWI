@@ -93,23 +93,27 @@ usersRouter.post('/login', async (req, res) => {
     const user = await User.findOne({"email": req.body.email});
     console.log(`req`);
     console.log(req.body);
-    if (!user) return res.status(404).json({ status: 'error', message: 'Email not found' });
+    if (!user) return res.send({ status: 'error', message: 'Email not found' });
     // Check Password
     const correctPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!correctPassword) return res.status(404).json({ status: 'error', message: "wrong password" });
+    if (!correctPassword) return res.send({ status: 'error', message: "wrong password" });
     jwtr.sign(
       {"_id": user._id},
       process.env.SECRET_TOKEN
     ).then((token) => {
-      console.log(token);
+      // console.log(token);
       res.header('auth-token', token);
-      res.json({ token: token });
+      delete user.password;
+      res.send({
+        token: token,
+        user: user,
+      });
     }).catch((error) => {
       console.log(`error = ${error}`);
-      res.json({ status: 'error', message: error });
+      res.send({ status: 'error', message: error });
     });
   } catch (error) {
-  res.status(500).json({ status: 'error', message: error });
+  res.send({ status: 'error', message: error });
 }});
 
 // EDIT A USER
