@@ -39,10 +39,10 @@ const Navbar = () => {
           <Typography variant="h6" className={classes.title}>
             {' '}
           </Typography>
-          <Link className={classes.link} to='/login'>
+          <Link className={classes.link} to='/signup'>
             <Button color="inherit">Sign Up</Button>
           </Link>
-          <Link className={classes.link} to='/signup'>
+          <Link className={classes.link} to='/login'>
             <Button color="inherit">Login</Button>
           </Link>
         </Toolbar>
