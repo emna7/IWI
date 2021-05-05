@@ -254,6 +254,45 @@ clubsRouter.post('/:id/join', auth, async (req, res) => {
   }
 });
 
+// IMMEDIATELY FOLLOW A CLUB
+clubsRouter.post('/:id/follow', auth, async (req, res) => {
+  try {
+    const club = await Club.findById(req.params.id);
+    if (!club) {
+      res.status(404).send('Cannot be found');
+      return;
+    }
+    if (club.createdBy == req.user._id)
+    return res.status(403).send("you are already the owner of this club!");
+
+    club.members.push(req.user._id);
+    const savedClub = await club.save();
+
+    // Send Notification to the club creator
+    const owner = await User.findById(club.createdBy)
+    const user = await User.findById(req.user._id)
+    const notif = {
+      action: 'ClubFollowed',
+      links: [{content: user.username, id: req.user._id}, {content: club.title, id: club._id}],
+      from: req.user._id,
+      to: club.createdBy,
+    }
+    let updateduser = await User.updateOne(
+      { _id: club.createdBy},
+      {$push: {'notifications': notif}}
+    );
+
+    updateduser = await User.updateOne(
+      { _id: req.user._id},
+      {$push: {'userClubs.joinedClubs': club._id}}
+    );
+    res.send("You followed the club!");
+  } catch (error) {
+    res.status(500).json({ message: "error" });
+  }
+});
+
+
 // CANCEL YOUR REQUEST
 clubsRouter.post('/:id/cancel', auth, async (req, res) => {
   try {
