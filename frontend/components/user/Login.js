@@ -14,7 +14,7 @@ const Login=()=>{
 
 	const paperStyle={padding :20,height:'70vh',width:280, margin:"20px auto"}
 	const avatarStyle={backgroundColor:'#1bbd7e'}
-	const btnstyle={margin:'8px 0'}
+	const btnstyle={margin:'8px 0', backgroundColor:'#1bbd7e', color:'white'}
 	return(
 		<Grid>
 			<Paper elevation={10} style={paperStyle}>
@@ -41,8 +41,8 @@ const Login=()=>{
   				</Typography>
   				<Typography> Do you have an account?
 					<Link href="#" >
-    				Sign Up
-  					</Link>
+    				Sign In
+  				</Link>
   				</Typography>
 			</Paper>
 		</Grid>

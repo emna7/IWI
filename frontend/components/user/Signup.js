@@ -12,7 +12,8 @@ const Signup=()=>{
 const paperStyle={padding:'30px 20px', width:300, margin:"20px auto"}
 const headerStyle={margin:0}
 const avatarStyle={backgroundColor:'#1bbd7e'}
-const marginTop={marginTop:10}
+const marginTop={marginTop:20}
+const btnstyle={backgroundColor:'#1bbd7e', color:'white'}
 	return (
 		<Grid>
 			<Paper elevation={20} style={paperStyle}>
@@ -27,7 +28,7 @@ const marginTop={marginTop:10}
 			  		<TextField fullWidth label='First Name' placeholder="Enter your first name"/>
 			  		<TextField fullWidth label='Last Name' placeholder="Enter your last name"/>
 			  		<TextField fullWidth label='Email' placeholder="Enter your email"/>
-			  		<FormControl component="fieldset" style={{'marginTop'}}>
+			  		<FormControl component="fieldset" style={marginTop}>
     					<FormLabel component="legend">Gender</FormLabel>
       					<RadioGroup aria-label="gender" name="gender" style={{display: 'initial'}}>
         					<FormControlLabel value="female" control={<Radio />} label="Female" />
@@ -42,7 +43,7 @@ const marginTop={marginTop:10}
         				control={<Checkbox name="checkedA" />}
         				label="I accept the terms and conditions"
       				/>
-			  		<Button type='submit' variant='contained' color='primary'></Button>
+			  		<Button type='submit' color='#1bbd7e' variant="Contained" style={btnstyle} fullWidth>Sign Up</Button>
 			  	</form>
 			</Paper>
 		</Grid>

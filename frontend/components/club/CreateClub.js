@@ -150,4 +150,4 @@ export default function Club() {
       </Box>
     </Container>
   );
-};
+}
