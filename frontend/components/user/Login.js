@@ -13,6 +13,9 @@ import axios from 'axios';
 import { useSelector, useDispatch, } from 'react-redux';
 import { login, } from '../../redux/actions/userActions';
 import { getFromStorage, setInStorage, } from '../../utils/storage';
+import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
+import Alert from '@material-ui/lab/Alert';
+import { useHistory } from "react-router-dom";
 
 const Login = () => {
 	
@@ -36,6 +39,8 @@ const Login = () => {
 
 	// JS
 	const dispatch = useDispatch();
+	const history = useHistory();
+
 	const [currentState, setState] = useState({
 		isLoading: false,
 		loginMsg: '',
@@ -60,7 +65,7 @@ const Login = () => {
 		});
 	};
 
-	const onLogin = async () => {
+	const submitLogin = async () => {
 		const { email, password, } = currentState;
 
 		let result; // contains the api call result
@@ -102,8 +107,11 @@ const Login = () => {
 				isLoading: false,
 				loginMsg: '',
 			});
+			history.push('/');
 		}
 	};
+
+	const { email, password, loginMsg, } = currentState;
 
 	return(
 		<Grid>
@@ -112,53 +120,68 @@ const Login = () => {
 					<Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
 					<h2>Login</h2>
 				</Grid>
-				<TextField
-					label='Email'
-					placeholder='Enter Email'
-					name='email'
-					fullWidth
-					required
-					onChange={(e) => handleInputChange(e)}
-				/>
-				<TextField
-					label='Password'
-					placeholder='Enter password'
-					type='password'
-					name='password'
-					fullWidth
-					required
-					onChange={(e) => handleInputChange(e)}
-				/>
-				<FormControlLabel
-					control={
-						<Checkbox
-							name="rememberMe"
-							color="primary"
-							onChange={(e) => handleCheckboxChange(e)}
-						/>
-					}
-					label="Remember me"
-				/>
-				<Button
-					onClick={(e) => onLogin()}
-					type='submit'
-					color='primary'
-					variant="Contained"
-					style={btnstyle}
-					fullWidth
+				<ValidatorForm
+					// ref='form'
+					onSubmit={submitLogin}
 				>
-					Sign In
-				</Button>
-				<Typography> 
-					<Link to="/" >
-    				Forgot Password?
-  				</Link>
-  				</Typography>
-  				<Typography> Don't have an account ?
-					<Link to='/signup' >
-    				Sign Up
-  				</Link>
-  				</Typography>
+					<TextValidator
+						label='Email'
+						placeholder='Enter Email'
+						name='email'
+						fullWidth
+						value={email}
+						onChange={(e) => handleInputChange(e)}
+						validators={['required', 'isEmail']}
+            errorMessages={['this field is required', 'email is not valid']}
+					/>
+					<TextValidator
+						label='Password'
+						placeholder='Enter password'
+						type='password'
+						name='password'
+						fullWidth
+						value={password}
+						onChange={(e) => handleInputChange(e)}
+						validators={['required']}
+            errorMessages={['this field is required']}
+					/>
+					<FormControlLabel
+						control={
+							<Checkbox
+								name="rememberMe"
+								color="primary"
+								onChange={(e) => handleCheckboxChange(e)}
+							/>
+						}
+						label="Remember me"
+					/>
+					{
+						email &&
+						password &&
+						loginMsg &&
+						<Alert severity="error">{loginMsg}</Alert>
+					}
+					<Button
+						onClick={(e) => submitLogin()}
+						type='submit'
+						color='primary'
+						variant="Contained"
+						style={btnstyle}
+						fullWidth
+					>
+						Sign In
+					</Button>
+					<Typography> 
+						<Link to="/" >
+							Forgot Password?
+						</Link>
+					</Typography>
+					<Typography> Don't have an account? 
+						<Link to='/signup' >
+							Sign Up
+						</Link>
+					</Typography>
+				</ValidatorForm>
 			</Paper>
 		</Grid>
 	)
