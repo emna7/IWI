@@ -4,6 +4,7 @@ const eventschema = mongoose.Schema({
     title: String,
     description: String,
     takesPlace: {from: Date, to: Date},
+    category: String,
     location: {country: String, state: String, city: String},
     createdBy: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     createdAt: {

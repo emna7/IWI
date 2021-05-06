@@ -20,6 +20,37 @@ eventsRouter.get('/', async (req, res) => {
   }
 });
 
+// GET EVENTS BY SEARCH FILTERS.
+eventsRouter.get('/', async (req, res) => {
+  try {
+    const {
+      title,
+      country,
+      state,
+      city,
+      category,
+      startDate,
+      endDate,
+    } = req.body;
+    const events = await Event.find({
+      title,
+      location: {
+        country,
+        state,
+        city,
+      },
+      category,
+      takesPlace: {
+        from: startDate,
+        to: endDate,
+      }
+    });
+    res.send({ status: 'success', data: events });
+  } catch (error) {
+    res.send({ status: 'error', message: error });
+  }
+});
+
 // GET A SPECIFIC EVENT
 eventsRouter.get('/:id', async (req, res) => {
   try {

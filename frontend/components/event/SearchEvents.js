@@ -17,6 +17,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import locations from './../../utils/locations';
+import categories from './../../utils/categories';
 
 import {
   MuiPickersUtilsProvider,
@@ -55,8 +56,8 @@ const useStyles = makeStyles((theme) => ({
 
   formControl: {
     marginTop: theme.spacing(1),
-    width: "50%",
-    marginBottom: theme.spacing(3),
+    width: "100%",
+    marginBottom: theme.spacing(1),
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
@@ -65,19 +66,16 @@ const useStyles = makeStyles((theme) => ({
 
 const SearchEvents = () => {
   const classes = useStyles();
-  const [expanded, setExpanded] = React.useState('panel1');
 
   const [currentState, setState] = React.useState({
+    title: '',
     country: '',
     state: '',
     city: '',
+    category: '',
     startDate: null,
     endDate: null,
   });
-
-  const handleChange = (panel) => (event, newExpanded) => {
-    setExpanded(newExpanded ? panel : false);
-  };
 
   const handleInputChange = (e) => {
 		const {name, value} = e.target;
@@ -87,16 +85,14 @@ const SearchEvents = () => {
 		});
 	};
 
-  const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
+  const submitSearch = () => {};
 
   const {
+    title,
     country,
     state,
     city,
+    category,
     startDate,
     endDate,
   } = currentState;
@@ -106,111 +102,141 @@ const SearchEvents = () => {
       <CssBaseline />
       <div className={classes.paper}>
         <Container align="center" >
-        <Avatar align="center" className={classes.avatar}>
-          <SearchIcon />
-        </Avatar>
+          <Avatar align="center" className={classes.avatar}>
+            <SearchIcon />
+          </Avatar>
         </Container>
         <Box textAlign="center">
-        <Typography  component="h1" variant="h5">
-          Events Search
-        </Typography>
+          <Typography  component="h1" variant="h5">
+            Search Events
+          </Typography>
         </Box>
-        {/* COUNTRY */}
-					<FormControl className={classes.formControl}>
-        		<InputLabel id="demo-simple-select-label">Country</InputLabel>
-						<Select
-							labelId="demo-simple-select-label"
-							id="demo-simple-select"
-							value={country}
-							name='country'
-							onChange={(e) => handleInputChange(e)}
-						>
-							<MenuItem value=''>None</MenuItem>
-							{
-								Object.keys(locations).map((l, i) => {
-									return <MenuItem key={i} value={l}>{l}</MenuItem>
-								})
-							}
-						</Select>
-					</FormControl>
+        <Grid container justify="space-around">
 
-					{/* STATE */}
-					{
-						country &&
-						<FormControl className={classes.formControl}>
-        		<InputLabel id="demo-simple-select-label">State</InputLabel>
-						<Select
-							labelId="demo-simple-select-label"
-							id="demo-simple-select"
-							value={state}
-							name='state'
-							onChange={(e) => handleInputChange(e)}
-						>
-							<MenuItem value=''>None</MenuItem>
-							{
-								Object.keys(locations[`${country}`]).map((l, i) => {
-									return <MenuItem key={i} value={l}>{l}</MenuItem>
-								})
-							}
-						</Select>
-					</FormControl>
-					}
+          <TextField
+            className={classes.formControl}
+            id='standard-basic'
+            label='Event title'
+            name='title'
+            value={title}
+            onChange={(e) => handleInputChange(e)}
+          />
 
-					{/* CITY */}
-					{
-						country && state &&
-						<FormControl className={classes.formControl}>
-        		<InputLabel id="demo-simple-select-label">City</InputLabel>
-						<Select
-							labelId="demo-simple-select-label"
-							id="demo-simple-select"
-							value={city}
-							name='city'
-							onChange={(e) => handleInputChange(e)}
-						>
-							<MenuItem value=''>None</MenuItem>
-							{
-								Object.keys(locations[`${country}`][`${state}`]).map((l, i) => {
-									return <MenuItem key={i} value={l}>{l}</MenuItem>
-								})
-							}
-						</Select>
-					</FormControl>
-					}
-         
-      <FormLabel className={classes.FormLabel} component="legend">Date/Time:</FormLabel>
-  
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <Grid container justify="space-around">
-        <KeyboardDatePicker
-          disableToolbar
-          variant="inline"
-          format="MM/dd/yyyy"
-          margin="normal"
-          id="date-picker-inline"
-          label="Start date"
-          value={selectedDate}
-          onChange={handleDateChange}
-          KeyboardButtonProps={{
-            'aria-label': 'change date',
-          }}
-        />
-        <KeyboardDatePicker
-          variant="inline"
-          disableToolbar
-          margin="normal"
-          id="date-picker-dialog"
-          label="End date"
-          format="MM/dd/yyyy"
-          value={selectedDate}
-          onChange={handleDateChange}
-          KeyboardButtonProps={{
-            'aria-label': 'change date',
-          }}
-        />
-      </Grid>
-    </MuiPickersUtilsProvider>
-  
+          {/* COUNTRY */}
+          <FormControl className={classes.formControl}>
+            <InputLabel id="demo-simple-select-label">Country</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={country}
+              name='country'
+              onChange={(e) => handleInputChange(e)}
+            >
+              <MenuItem value=''>None</MenuItem>
+              {
+                Object.keys(locations).map((l, i) => {
+                  return <MenuItem key={i} value={l}>{l}</MenuItem>
+                })
+              }
+            </Select>
+          </FormControl>
+
+          {/* STATE */}
+          {
+            country &&
+            <FormControl className={classes.formControl}>
+            <InputLabel id="demo-simple-select-label">State</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={state}
+              name='state'
+              onChange={(e) => handleInputChange(e)}
+            >
+              <MenuItem value=''>None</MenuItem>
+              {
+                Object.keys(locations[`${country}`]).map((l, i) => {
+                  return <MenuItem key={i} value={l}>{l}</MenuItem>
+                })
+              }
+            </Select>
+          </FormControl>
+          }
+
+          {/* CITY */}
+          {
+            country && state &&
+            <FormControl className={classes.formControl}>
+              <InputLabel id="demo-simple-select-label">City</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={city}
+                name='city'
+                onChange={(e) => handleInputChange(e)}
+              >
+                <MenuItem value=''>None</MenuItem>
+                {
+                  Object.keys(locations[`${country}`][`${state}`]).map((l, i) => {
+                    return <MenuItem key={i} value={l}>{l}</MenuItem>
+                  })
+                }
+              </Select>
+            </FormControl>
+          }
+
+          {/* CATEGORY */}
+          <FormControl className={classes.formControl}>
+            <InputLabel id="demo-simple-select-label">Category</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={category}
+              name='category'
+              onChange={(e) => handleInputChange(e)}
+            >
+              <MenuItem value=''>None</MenuItem>
+              {
+                categories.map((l, i) => {
+                  return <MenuItem key={i} value={l}>{l}</MenuItem>
+                })
+              }
+            </Select>
+          </FormControl>
+
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <KeyboardDatePicker
+              className={classes.formControl}
+              disableToolbar
+              variant="inline"
+              format="MM/dd/yyyy"
+              margin="normal"
+              id="date-picker-inline"
+              label="Start date"
+              value={startDate}
+              name='startDate'
+              onChange={(e) => handleInputChange(e)}
+              KeyboardButtonProps={{
+                'aria-label': 'change start date',
+              }}
+            />
+            <KeyboardDatePicker
+              className={classes.formControl}
+              variant="inline"
+              disableToolbar
+              margin="normal"
+              id="date-picker-dialog"
+              label="End date"
+              format="MM/dd/yyyy"
+              value={endDate}
+              name='endDate'
+              onChange={(e) => handleInputChange(e)}
+              KeyboardButtonProps={{
+                'aria-label': 'change end date',
+              }}
+            />
+          </MuiPickersUtilsProvider>
+
           <Button
             type="submit"
             fullWidth
@@ -220,7 +246,7 @@ const SearchEvents = () => {
           >
             Search
           </Button>
-          
+        </Grid>
       </div>
     </Container>
   );
