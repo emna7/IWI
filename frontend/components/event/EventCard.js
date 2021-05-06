@@ -20,6 +20,7 @@ import Box from '@material-ui/core/Box';
 import defaultEventImage from '../../../assets/event.jpg';
 import Chip from '@material-ui/core/Chip';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import moment from 'moment';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -84,6 +85,26 @@ const EventCard = (props) => {
                   <span style={{ fontWeight: 300, }} >{event.location.city && `, ${event.location.city}`}</span>
                 </Typography>
               }
+              <Typography>
+                <Box>
+                  <div style={{ display: 'inline', fontWeight: 500, }} >Starts{` `}</div>
+                  <span>
+                    {
+                      moment(event.startDate).format('MMMM Do YYYY')
+                    }
+                  </span>
+                </Box>
+              </Typography>
+              <Typography>
+                <Box>
+                  <div style={{ display: 'inline', fontWeight: 500, }} >Ends{` `}</div>
+                  <span>
+                    {
+                      moment(event.startDate).format('MMMM Do YYYY')
+                    }
+                  </span>
+                </Box>
+              </Typography>
             </div>
             {
               event.category &&
@@ -93,13 +114,7 @@ const EventCard = (props) => {
         </div>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
-        </IconButton>
-        <IconButton aria-label="share">
-          <ShareIcon />
-        </IconButton>
-        <Link className={classes.link} to={`/events/${event.id}`}>
+        <Link className={classes.link} to={`/events/${event._id}`}>
           <Button size="small" color="primary">
             View
           </Button>
