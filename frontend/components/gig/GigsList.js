@@ -10,8 +10,7 @@ import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import ListIcon from '@material-ui/icons/List';
-
-
+import SearchGigs from './SearchGigs';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -68,6 +67,7 @@ export default function GigsList() {
   return (
     <Container className={classes.cardGrid} component="main" maxWidth="xs">
           <Container align="center" >
+            <SearchGigs />
         <Avatar align="center" className={classes.avatar}>
           <ListIcon />
         </Avatar>

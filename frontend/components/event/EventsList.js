@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSelector, useDispatch, } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -11,6 +12,9 @@ import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import ListIcon from '@material-ui/icons/List';
 import SearchEvents from './SearchEvents';
+import EventCard from './EventCard';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -57,52 +61,39 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-const cards = [1, 2, 3, 4];
-
 export default function EventsList() {
   const classes = useStyles();
-  
+  const events = useSelector((state) => state.events);
+  console.log('events');
+  console.log(events);
   return (
-    <Container className={classes.cardGrid} component="main" maxWidth="xs">
+    <Container className={classes.cardGrid} component="main" maxWidth="lg">
+      <CssBaseline />
       <SearchEvents />
-          <Container align="center" >
-        <Avatar align="center" className={classes.avatar}>
-          <ListIcon />
-        </Avatar>
-        </Container>
-        <Box textAlign="center" className={classes.FormLabel}>
-        <Typography  component="h1" variant="h5" >
-          Events List
-        </Typography>
-        </Box>
-          <Box container spacing={2}>
-            {cards.map((card) => (
-              <Box item key={card} xs={12} sm={6} md={4}>
-                <Card className={classes.card}>
-                <CardHeader
-        avatar={
-          <Avatar alt="Remy Sharp" src='https://source.unsplash.com/random' />
+      <Container align="center" >
+      <Avatar align="center" className={classes.avatar}>
+        <ListIcon />
+      </Avatar>
+      </Container>
+      <Box textAlign="center" className={classes.FormLabel}>
+      <Typography  component="h1" variant="h5" >
+        Events List
+      </Typography>
+      </Box>
+      <Grid
+        container
+        direction="column"
+        justify="center"
+        alignItems="center"
+      >
+        {
+          events.length === 0 ?
+          <div>
+            Make a search with the filters above.
+          </div> :
+          events.map((oneEvent, i) => <EventCard key={i} event={oneEvent} />)
         }
-        
-        title="What is Lorem Ipsum?"
-      />
-                  
-                  <CardContent className={classes.cardContent}>
-                    
-                    <Typography>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has........................
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button size="small" color="primary">
-                      View
-                    </Button>
-                    
-                  </CardActions>
-                </Card>
-              </Box>
-            ))}
-          </Box>
-        </Container>
+      </Grid>
+    </Container>
   );
-            }
+};

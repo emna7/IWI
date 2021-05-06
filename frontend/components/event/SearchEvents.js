@@ -18,12 +18,15 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import locations from './../../utils/locations';
 import categories from './../../utils/categories';
+import { useSelector, useDispatch, } from 'react-redux';
+import { searchEvents,} from '../../redux/actions/eventActions';
 
 import {
   MuiPickersUtilsProvider,
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -65,6 +68,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SearchEvents = () => {
+
+  const dispatch = useDispatch();
   const classes = useStyles();
 
   const [currentState, setState] = React.useState({
@@ -85,7 +90,60 @@ const SearchEvents = () => {
 		});
 	};
 
-  const submitSearch = () => {};
+  const handleStartDate = (date) => {
+		setState({
+			...currentState,
+			startDate: date,
+		});
+	};
+
+  const handleEndDate = (date) => {
+		setState({
+			...currentState,
+			endDate: date,
+		});
+	};
+
+  const submitSearch = async () => {
+    const {
+      title,
+      country,
+      state,
+      city,
+      category,
+      startDate,
+      endDate,
+    } = currentState;
+
+    let result;
+    let reqParams = {};
+    
+    for (const [k, v] of Object.entries(currentState)) {
+      // console.log(`${k} = ${v}`);
+      if (v != null && v != undefined && v.trim() != '') {
+        reqParams[k] = v;
+      }
+    }
+
+    console.log(reqParams);
+
+    const eventsData = await axios
+    .get(
+      `${process.env.REACT_APP_API_URL}/events`,
+      {
+        params: reqParams,
+      },
+    )
+    .then((res) => {
+      const { data } = res;
+      result = data;
+      // console.log(result);
+      dispatch(searchEvents(result.data));
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  };
 
   const {
     title,
@@ -215,7 +273,7 @@ const SearchEvents = () => {
               label="Start date"
               value={startDate}
               name='startDate'
-              onChange={(e) => handleInputChange(e)}
+              onChange={(e) => handleStartDate(e)}
               KeyboardButtonProps={{
                 'aria-label': 'change start date',
               }}
@@ -230,7 +288,7 @@ const SearchEvents = () => {
               format="MM/dd/yyyy"
               value={endDate}
               name='endDate'
-              onChange={(e) => handleInputChange(e)}
+              onChange={(e) => handleEndDate(e)}
               KeyboardButtonProps={{
                 'aria-label': 'change end date',
               }}
@@ -243,6 +301,7 @@ const SearchEvents = () => {
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={(e) => submitSearch(e)}
           >
             Search
           </Button>

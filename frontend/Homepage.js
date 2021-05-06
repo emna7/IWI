@@ -75,11 +75,14 @@ const Homepage = () => {
         <div className={classes.heroContent}>
           <Container maxWidth="sm">
             <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-            IWI means People in Maori
+            IWI
             </Typography>
             <Typography variant="h5" align="center" color="textSecondary" paragraph>
-            IWI is a social platform connecting people sharing the same interests, mainly for community development.
-            It allows people to find gigs, to join community clubs and to participate in events and initiatives.
+              IWI is a social platform connecting people sharing the same interests, mainly for community development.
+              It allows people to find gigs, to join community clubs and to participate in events and initiatives.
+            </Typography>
+            <Typography variant="h5" align="center" color="textSecondary" paragraph>
+              Iwi means People in Maori
             </Typography>
             <div className={classes.heroButtons}>
               <Grid container spacing={2} justify="center">

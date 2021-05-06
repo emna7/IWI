@@ -10,9 +10,7 @@ import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import ListIcon from '@material-ui/icons/List';
-
-
-
+import SearchClubs from './SearchClubs';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -68,6 +66,7 @@ export default function ClubsList() {
   return (
     <Container className={classes.cardGrid} component="main" maxWidth="xs">
           <Container align="center" >
+            <SearchClubs />
         <Avatar align="center" className={classes.avatar}>
           <ListIcon />
         </Avatar>

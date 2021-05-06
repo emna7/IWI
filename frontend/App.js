@@ -14,6 +14,7 @@ import GigsList from './components/gig/GigsList';
 import EventsList from './components/event/EventsList';
 import Login from './components/user/Login';
 import SignUp from './components/user/Signup';
+import EventPage from './components/event/EventPage';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -78,6 +79,7 @@ function App() {
           <Route path='/gigs' exact component={GigsList} />
           <Route path='/clubs' exact component={ClubsList} />
           <Route path='/events' exact component={EventsList} />
+          <Route path='/events/:eventId' exact component={EventPage} />
         </Switch>
         <Footer />
       </Router>
