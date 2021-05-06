@@ -14,7 +14,6 @@ eventsRouter.use('/:eventId/posts', postsRouter);
 eventsRouter.get('/', async (req, res) => {
   try {
     let query = {
-      title: req.query.title,
       location: {
         country: req.query.country,
         state: req.query.state,
@@ -28,8 +27,14 @@ eventsRouter.get('/', async (req, res) => {
     };
     query = JSON.parse(JSON.stringify(query));
     Object.keys(query).forEach(key => JSON.stringify(query[key]) === '{}' && delete query[key])
-    const events = await Event.find(query);
-
+    let events;
+    if (req.query.title !== undefined) {
+      const x = req.query.title.trim().split(' ');
+      const regex = x.map(function (e) { return new RegExp(e, "ig"); });
+      events = await Event.find({$or: [{"title" : { "$in": regex }}, {"description" : { "$in": regex }}], ...query});
+    } else {
+      events = await Event.find(query);
+    }
     res.send({ status: 'success', data: events });
   } catch (error) {
     res.send({ status: 'error', message: error });
