@@ -10,41 +10,26 @@ const postsRouter = require('./posts');
 
 eventsRouter.use('/:eventId/posts', postsRouter);
 
-// GET ALL EVENTS
+// GET  ALL EVENTS  && GET EVENTS BY SEARCH FILTERS.
 eventsRouter.get('/', async (req, res) => {
   try {
-  const events = await Event.find();
-  res.json(events)
-  } catch (error) {
-    res.status(500).json({ message: error });
-  }
-});
-
-// GET EVENTS BY SEARCH FILTERS.
-eventsRouter.get('/', async (req, res) => {
-  try {
-    const {
-      title,
-      country,
-      state,
-      city,
-      category,
-      startDate,
-      endDate,
-    } = req.body;
-    const events = await Event.find({
-      title,
+    let query = {
+      title: req.query.title,
       location: {
-        country,
-        state,
-        city,
+        country: req.query.country,
+        state: req.query.state,
+        city: req.query.city,
       },
-      category,
+      category: req.query.category,
       takesPlace: {
-        from: startDate,
-        to: endDate,
+        from: req.query.startDate,
+        to: req.query.endDate,
       }
-    });
+    };
+    query = JSON.parse(JSON.stringify(query));
+    Object.keys(query).forEach(key => JSON.stringify(query[key]) === '{}' && delete query[key])
+    const events = await Event.find(query);
+
     res.send({ status: 'success', data: events });
   } catch (error) {
     res.send({ status: 'error', message: error });
