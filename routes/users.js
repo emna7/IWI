@@ -47,18 +47,16 @@ usersRouter.post('/signup', async (req, res) => {
     // SIGNUP INPUT DATA VALIDATION
     let alreadyExist = await User.findOne({"email": req.body.email});
     if (alreadyExist) {
-      return res.status(409).json({
-        success: false,
+      return res.send({
         status: 'error',
         message: 'Email already used',
       });
     }
     alreadyExist = await User.findOne({"username": req.body.username});
     if (alreadyExist) {
-      return res.status(409).json({
-        success: false,
+      return res.send({
         status: 'error',
-        message: 'username already used',
+        message: 'Username already used',
       });
     }
     // hash password
@@ -72,13 +70,12 @@ usersRouter.post('/signup', async (req, res) => {
     const user = new User(userData);
     const savedUser = await user.save();
     // res.json(savedUser);
-    res.status(201).json({
-      success: true,
+    res.send({
+      status: 'success',
       message: "Account successfully created",
     });
   } catch (error) {
-    res.status(500).json({
-      success: true,
+    res.send({
       status: 'error',
       message: error,
     });
@@ -96,7 +93,7 @@ usersRouter.post('/login', async (req, res) => {
     if (!user) return res.send({ status: 'error', message: 'Email not found' });
     // Check Password
     const correctPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!correctPassword) return res.send({ status: 'error', message: "wrong password" });
+    if (!correctPassword) return res.send({ status: 'error', message: "Wrong password" });
     jwtr.sign(
       {"_id": user._id},
       process.env.SECRET_TOKEN

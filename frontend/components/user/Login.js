@@ -21,10 +21,9 @@ const Login = () => {
 	
 	// CSS
 	const paperStyle={
-		padding :20,
-		height:'70vh',
-		width:280,
-		margin:"20px auto",
+		padding: 20,
+		width: 340,
+		margin: "50px auto 294px auto",
 	};
 
 	const avatarStyle={
@@ -121,7 +120,6 @@ const Login = () => {
 					<h2>Login</h2>
 				</Grid>
 				<ValidatorForm
-					// ref='form'
 					onSubmit={submitLogin}
 				>
 					<TextValidator
@@ -162,7 +160,6 @@ const Login = () => {
 						<Alert severity="error">{loginMsg}</Alert>
 					}
 					<Button
-						onClick={(e) => submitLogin()}
 						type='submit'
 						color='primary'
 						variant="Contained"

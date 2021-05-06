@@ -12,26 +12,17 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import DateFnsUtils from '@date-io/date-fns';
+import Select from '@material-ui/core/Select';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import locations from './../../utils/locations';
 
 import {
-    MuiPickersUtilsProvider,
-    KeyboardTimePicker,
-    KeyboardDatePicker,
-  } from '@material-ui/pickers';
-
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+  MuiPickersUtilsProvider,
+  KeyboardTimePicker,
+  KeyboardDatePicker,
+} from '@material-ui/pickers';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -72,21 +63,43 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SearchEvents() {
-  const [paid, setPaid] = React.useState('paid');
-
-
+const SearchEvents = () => {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState('panel1');
+
+  const [currentState, setState] = React.useState({
+    country: '',
+    state: '',
+    city: '',
+    startDate: null,
+    endDate: null,
+  });
 
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   };
+
+  const handleInputChange = (e) => {
+		const {name, value} = e.target;
+		setState({
+			...currentState,
+			[name]: value,
+		});
+	};
+
   const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
+
+  const {
+    country,
+    state,
+    city,
+    startDate,
+    endDate,
+  } = currentState;
 
   return (
     <Container component="main" maxWidth="xs">
@@ -102,11 +115,68 @@ export default function SearchEvents() {
           Events Search
         </Typography>
         </Box>
-        <FormLabel className={classes.FormLabel} component="legend">Location:</FormLabel>
+        {/* COUNTRY */}
+					<FormControl className={classes.formControl}>
+        		<InputLabel id="demo-simple-select-label">Country</InputLabel>
+						<Select
+							labelId="demo-simple-select-label"
+							id="demo-simple-select"
+							value={country}
+							name='country'
+							onChange={(e) => handleInputChange(e)}
+						>
+							<MenuItem value=''>None</MenuItem>
+							{
+								Object.keys(locations).map((l, i) => {
+									return <MenuItem key={i} value={l}>{l}</MenuItem>
+								})
+							}
+						</Select>
+					</FormControl>
 
-        <form className={classes.root} noValidate autoComplete="off">
-        <TextField id="outlined-basic" variant="outlined" />
-        </form>
+					{/* STATE */}
+					{
+						country &&
+						<FormControl className={classes.formControl}>
+        		<InputLabel id="demo-simple-select-label">State</InputLabel>
+						<Select
+							labelId="demo-simple-select-label"
+							id="demo-simple-select"
+							value={state}
+							name='state'
+							onChange={(e) => handleInputChange(e)}
+						>
+							<MenuItem value=''>None</MenuItem>
+							{
+								Object.keys(locations[`${country}`]).map((l, i) => {
+									return <MenuItem key={i} value={l}>{l}</MenuItem>
+								})
+							}
+						</Select>
+					</FormControl>
+					}
+
+					{/* CITY */}
+					{
+						country && state &&
+						<FormControl className={classes.formControl}>
+        		<InputLabel id="demo-simple-select-label">City</InputLabel>
+						<Select
+							labelId="demo-simple-select-label"
+							id="demo-simple-select"
+							value={city}
+							name='city'
+							onChange={(e) => handleInputChange(e)}
+						>
+							<MenuItem value=''>None</MenuItem>
+							{
+								Object.keys(locations[`${country}`][`${state}`]).map((l, i) => {
+									return <MenuItem key={i} value={l}>{l}</MenuItem>
+								})
+							}
+						</Select>
+					</FormControl>
+					}
          
       <FormLabel className={classes.FormLabel} component="legend">Date/Time:</FormLabel>
   
@@ -138,16 +208,6 @@ export default function SearchEvents() {
             'aria-label': 'change date',
           }}
         />
-        <KeyboardTimePicker
-          margin="normal"
-          id="time-picker"
-          label="Time"
-          value={selectedDate}
-          onChange={handleDateChange}
-          KeyboardButtonProps={{
-            'aria-label': 'change time',
-          }}
-        />
       </Grid>
     </MuiPickersUtilsProvider>
   
@@ -162,9 +222,8 @@ export default function SearchEvents() {
           </Button>
           
       </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
     </Container>
   );
-}
+};
+
+export default SearchEvents;

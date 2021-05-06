@@ -10,9 +10,7 @@ import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import ListIcon from '@material-ui/icons/List';
-
-
-
+import SearchEvents from './SearchEvents';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -64,9 +62,9 @@ const cards = [1, 2, 3, 4];
 export default function EventsList() {
   const classes = useStyles();
   
-
   return (
     <Container className={classes.cardGrid} component="main" maxWidth="xs">
+      <SearchEvents />
           <Container align="center" >
         <Avatar align="center" className={classes.avatar}>
           <ListIcon />

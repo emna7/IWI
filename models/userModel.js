@@ -5,18 +5,15 @@ const userschema = mongoose.Schema({
 	firstName: {
     type: String,
     required: true,
-    default: '',
   },
 	lastName: {
     type: String,
     required: true,
-    default: '',
   },
   username: {
     type: String,
 		unique: true,
 		required: true,
-    default: '',
   },
   email: {
     type: String,
@@ -31,7 +28,7 @@ const userschema = mongoose.Schema({
 		type: String,
 		required: true
 	},
-  gender: String,
+  sex: String,
   birthday: Date,
 	coverPicture: String,
 	profilePicture: String,
