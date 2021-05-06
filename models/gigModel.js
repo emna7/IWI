@@ -5,9 +5,9 @@ const gigschema = mongoose.Schema({
   description: String,
   duration: String,
   paid: Boolean,
-  budget: Number,
+  budget: {min: Number, max: Number},
   takesPlace: {from: Date, to: Date},
-  location: {country: String, state: String, City: String},
+  location: {country: String, state: String, city: String},
   createdBy: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
   createdAt: {
     type: Date,

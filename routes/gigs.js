@@ -13,11 +13,34 @@ gigsRouter.use('/:gigId/reviews', commentsRouter);
 
 // GENERAL (FOR BOTH GIG CREATORS AND USUAL USERS)---------------START
 
-// GET ALL GIGS
+// GET ALL GIGS && GET GIGS BY SEARCH FILTERS AND KEYWORDS.
 gigsRouter.get('/', async (req, res) => {
   try {
-  const gigs = await Gig.find();
-  res.json(gigs)
+    let query = {
+      location: {
+        country: req.query.country,
+        state: req.query.state,
+        city: req.query.city,
+      },
+      paid: req.query.paid,
+      budget: {min: req.query.minBudget, max: req.query.maxBudget},
+      duration: req.query.duration,
+      takesPlace: {
+        from: req.query.startDate,
+        to: req.query.endDate,
+      }
+    };
+    query = JSON.parse(JSON.stringify(query));
+    Object.keys(query).forEach(key => JSON.stringify(query[key]) === '{}' && delete query[key])
+    let gigs;
+    if (req.query.title !== undefined) {
+      const x = req.query.title.trim().split(' ');
+      const regex = x.map(function (e) { return new RegExp(e, "ig"); });
+      gigs = await Gig.find({$or: [{"title" : { "$in": regex }}, {"description" : { "$in": regex }}], ...query});
+    } else {
+      gigs = await Gig.find(query);
+    }
+    res.send({ status: 'success', data: gigs });
 } catch (error) {
   res.status(500).json({ message: error });
 }

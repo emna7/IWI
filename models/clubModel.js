@@ -6,7 +6,7 @@ const clubschema = mongoose.Schema({
     category: String,
     coverPicture: String,
     profilePicture: String,
-    location: {country: String, state: String, City: String},
+    location: {country: String, state: String, city: String},
     createdBy: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     createdAt: {
       type: Date,

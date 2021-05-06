@@ -9,11 +9,28 @@ const postsRouter = require('./posts');
 
 clubsRouter.use('/:clubId/posts', postsRouter);
 
-// GET ALL CLUBS
+// GET ALL CLUBS && GET CLUBS BY SEARCH FILTERS AND KEYWORDS.
 clubsRouter.get('/', async (req, res) => {
   try {
-  const clubs = await Club.find();
-  res.json(clubs)
+    let query = {
+      location: {
+        country: req.query.country,
+        state: req.query.state,
+        city: req.query.city,
+      },
+      category: req.query.category
+    };
+    query = JSON.parse(JSON.stringify(query));
+    Object.keys(query).forEach(key => JSON.stringify(query[key]) === '{}' && delete query[key])
+    let clubs;
+    if (req.query.title !== undefined) {
+      const x = req.query.title.trim().split(' ');
+      const regex = x.map(function (e) { return new RegExp(e, "ig"); });
+      clubs = await Club.find({$or: [{"title" : { "$in": regex }}, {"description" : { "$in": regex }}], ...query});
+    } else {
+      clubs = await Club.find(query);
+    }
+  res.send({ status: 'success', data: clubs });
   } catch (error) {
     res.status(500).json({ message: error });
   }
