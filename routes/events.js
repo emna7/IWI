@@ -10,7 +10,7 @@ const postsRouter = require('./posts');
 
 eventsRouter.use('/:eventId/posts', postsRouter);
 
-// GET  ALL EVENTS  && GET EVENTS BY SEARCH FILTERS.
+// GET ALL EVENTS && GET EVENTS BY SEARCH FILTERS AND KEYWORDS.
 eventsRouter.get('/', async (req, res) => {
   try {
     let query = {
