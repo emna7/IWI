@@ -72,7 +72,7 @@ function App() {
           <Route path='/events' exact component={EventsList} />
           <Route path='/events/create' exact>
             {
-              currentUser ? <div>hello</div> : <Redirect to='/login' />
+              currentUser ? <CreateEvent /> : <Redirect to='/login' />
             }
           </Route>
           <Route path='/events/:eventId' exact>

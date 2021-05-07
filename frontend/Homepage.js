@@ -92,16 +92,11 @@ const Homepage = () => {
               <div className={classes.heroButtons}>
                 <Grid container spacing={2} justify="center">
                   <Grid item>
-                      <Link className={classes.link} to='/events/create'>
-                        <Button variant="contained" color="primary">
-                          Create an event
-                        </Button>
-                      </Link>
-                      <Link className={classes.link} to='/signup'>
-                        <Button variant="contained" color="primary">
-                          Create an account
-                        </Button>
-                      </Link>
+                    <Link className={classes.link} to='/signup'>
+                      <Button variant="contained" color="primary">
+                        Create an account
+                      </Button>
+                    </Link>
                   </Grid>
                   <Grid item>
                       <Link className={classes.link} to='/login'>

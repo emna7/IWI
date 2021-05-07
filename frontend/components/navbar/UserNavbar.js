@@ -140,15 +140,17 @@ const UserNavbar = () => {
                     {option.label}
                   </MenuItem>
                 ))}
+                <MenuItem>
+                  <Button
+                    color="inherit"
+                    onClick={(e) => handleLogout(e)}
+                  >
+                    Logout
+                  </Button>
+                </MenuItem>
               </Menu>
             </div>
             {/* Dropdown menu */}
-            <Button
-              color="inherit"
-              onClick={(e) => handleLogout(e)}
-            >
-              Logout
-            </Button>
         </Toolbar>
       </AppBar>
     </div>

@@ -64,9 +64,15 @@ eventsRouter.post('/', auth, async (req, res) => {
       { _id: event.createdBy},
       {$push: {'userEvents.createdEvents': event._id}}
     );
-    res.send("A new event is created");
+    res.send({
+      status: 'success',
+      message: 'The event has been created.',
+    });
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.send({
+      status: 'error',
+      message: error,
+    });
   }
 });
 

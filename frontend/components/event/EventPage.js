@@ -26,6 +26,7 @@ const EventPage = (props) => {
   const handleInteresedIn = async () => {
     await axios.post(
       `${process.env.REACT_APP_API_URL}/events/${event._id}/interested`,
+      {},
       {
         headers: {
           'auth-token': token,
