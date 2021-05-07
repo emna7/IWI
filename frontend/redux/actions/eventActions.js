@@ -6,3 +6,11 @@ export const searchEvents = (events) => {
     payload: events,
   };
 };
+
+export const selectEvent = (event) => {
+  return {
+    type: ActionTypes.SELECTED_EVENT,
+    payload: event,
+  };
+};
+

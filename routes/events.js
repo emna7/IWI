@@ -201,7 +201,10 @@ eventsRouter.post('/:id/interested', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) {
-      res.status(404).send('Cannot be found');
+      res.send({
+        status: 'error',
+        message: 'Cannot be found',
+      });
       return;
     }
     const user = await User.findById(req.user._id);
@@ -240,9 +243,15 @@ eventsRouter.post('/:id/interested', auth, async (req, res) => {
         {$pull: {'userEvents.participantInEvents': event._id}}
       );
     }
-    res.send("you are interested in this event");
+    res.send({
+      status: 'success',
+      message: "You are now interested in this event"
+    });
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.send({
+      status: 'error',
+      message: error,
+    });
   }
 });
 

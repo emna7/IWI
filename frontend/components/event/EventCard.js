@@ -21,6 +21,11 @@ import defaultEventImage from '../../../assets/event.jpg';
 import Chip from '@material-ui/core/Chip';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import moment from 'moment';
+import { useSelector, useDispatch, } from 'react-redux';
+import { selectEvent, } from './../../redux/actions/eventActions';
+import { useHistory } from "react-router-dom";
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import LocationOnIcon from '@material-ui/icons/LocationOn';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -51,15 +56,33 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+
 const EventCard = (props) => {
+  console.log(`PROPS ---> ${props}`);
+
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
 
+  const dispatch = useDispatch();
+	const history = useHistory();
+  const { event, } = props;
+
+  const handleEventChoice = () => {
+    // const chosenEvent = props.event;
+    
+    console.log(`chosenEvent --> ${event}`);
+
+    dispatch(selectEvent(event));
+    setTimeout(() => {
+      history.push(`/events/${event._id}`);
+    }, 400);
+  };
+  
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
-  const { event, } = props;
+  // const { event, } = props;
 
   return (
     <Card className={classes.card}>
@@ -79,32 +102,29 @@ const EventCard = (props) => {
               </Typography>
               {
                 event.location &&
+                event.location.country &&
                 <Typography>
                   <span style={{ fontWeight: 500, }} >{event.location.country && event.location.country}</span>
                   <span style={{ fontWeight: 400, }} >{event.location.state && `, ${event.location.state}`}</span>
                   <span style={{ fontWeight: 300, }} >{event.location.city && `, ${event.location.city}`}</span>
                 </Typography>
               }
-              <Typography>
-                <Box>
-                  <div style={{ display: 'inline', fontWeight: 500, }} >Starts{` `}</div>
-                  <span>
-                    {
-                      moment(event.startDate).format('MMMM Do YYYY')
-                    }
-                  </span>
+              <Box className="item-date" component="div" display="block">
+                <Box mt={1} className="date start" component="div" display="block">
+                  <>
+                    <AccessTimeIcon />{`  `}
+                    <strong>Start date </strong>
+                  </>
+                  { moment(event.startDate).format('MMMM Do YYYY') }
                 </Box>
-              </Typography>
-              <Typography>
-                <Box>
-                  <div style={{ display: 'inline', fontWeight: 500, }} >Ends{` `}</div>
-                  <span>
-                    {
-                      moment(event.startDate).format('MMMM Do YYYY')
-                    }
-                  </span>
+                <Box mt={1} className="date start" component="div" display="block">
+                  <>
+                    <AccessTimeIcon />{`  `}
+                    <strong>End date </strong>
+                  </>
+                  { moment(event.endDate).format('MMMM Do YYYY') }
                 </Box>
-              </Typography>
+              </Box>
             </div>
             {
               event.category &&
@@ -114,11 +134,9 @@ const EventCard = (props) => {
         </div>
       </CardContent>
       <CardActions disableSpacing>
-        <Link className={classes.link} to={`/events/${event._id}`}>
-          <Button size="small" color="primary">
-            View
-          </Button>
-        </Link>
+        <Button size="small" color="primary" onClick={handleEventChoice}>
+          View
+        </Button>
         <IconButton
           className={clsx(classes.expand, {
             [classes.expandOpen]: expanded,

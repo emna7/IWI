@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, Switch, Redirect } from 'react-router-dom';
 import React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { makeStyles } from '@material-ui/core/styles';
@@ -15,6 +15,8 @@ import EventsList from './components/event/EventsList';
 import Login from './components/user/Login';
 import SignUp from './components/user/Signup';
 import EventPage from './components/event/EventPage';
+import CreateEvent from './components/event/CreateEvent';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -44,29 +46,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const cards = [
-  {
-    image: gigImage,
-    title: "Gigs",
-    description: "People can find simple, paid or free tasks. Example: A student moving from a state to another, needs help with carrying heavy stuff.",
-    pageLink: "/",
-  },
-  {
-    image: clubImage,
-    title: "Clubs",
-    description: "People sharing the same interests can join the same clubs.  Example: Chess club, running club.",
-    pageLink: "/",
-  },
-  {
-    image: eventImage,
-    title: "Events",
-    description: "People can engage and participate in community-based events or activities. Example: Restoring a public park, Raising money for someone in need, Polyglot meeting, entertainment.",
-    pageLink: "/",
-  }
-];
-
 function App() {
   const classes = useStyles();
+  const currentUser = useSelector((state) => state.currentUser);
+
   return (
     <div className="App">
       <Router>
@@ -74,12 +57,29 @@ function App() {
         <Navbar />
         <Switch>
           <Route path='/' exact component={Homepage} />
-          <Route path='/login' exact component={Login} />
-          <Route path='/signup' exact component={SignUp} />
+          <Route path='/login' exact>
+            {
+              currentUser ? <Redirect to='/' /> : <Login />
+            }
+          </Route>
+          <Route path='/signup' exact>
+            {
+              currentUser ? <Redirect to='/' /> : <SignUp />
+            }
+          </Route>
           <Route path='/gigs' exact component={GigsList} />
           <Route path='/clubs' exact component={ClubsList} />
           <Route path='/events' exact component={EventsList} />
-          <Route path='/events/:eventId' exact component={EventPage} />
+          <Route path='/events/create' exact>
+            {
+              currentUser ? <div>hello</div> : <Redirect to='/login' />
+            }
+          </Route>
+          <Route path='/events/:eventId' exact>
+            {
+              currentUser ? <EventPage /> : <Redirect to='/login' />
+            }
+          </Route>
         </Switch>
         <Footer />
       </Router>

@@ -89,7 +89,7 @@ export default function EventsList() {
         {
           events.length === 0 ?
           <div>
-            Make a search with the filters above.
+            No events searched or 0 events found, make a new search.
           </div> :
           events.map((oneEvent, i) => <EventCard key={i} event={oneEvent} />)
         }

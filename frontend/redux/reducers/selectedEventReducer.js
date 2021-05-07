@@ -1,10 +1,10 @@
 import { ActionTypes } from '../constants/action-types';
 
-const initState = [];
+const initState = null;
 
-export const gigReducer = (state = initState, {type, payload}) => {
+export const selectedEventReducer = (state = initState, {type, payload}) => {
   switch (type) {
-    case ActionTypes.SEACHED_GIGS:
+    case ActionTypes.SELECTED_EVENT:
       return payload;
     default:
       return state;

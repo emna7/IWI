@@ -1,14 +1,16 @@
 import { combineReducers } from 'redux';
 import { userReducer, } from './userReducer';
-import { eventReducer, } from './eventReducer';
+import { eventsReducer, } from './eventsReducer';
 import { gigReducer, } from './gigReducer';
 import { clubReducer, } from './clubReducer';
+import { selectedEventReducer, } from './selectedEventReducer';
 
 const reducers = combineReducers({
   currentUser: userReducer,
-  events: eventReducer,
+  events: eventsReducer,
   gigs: gigReducer,
   clubs: clubReducer,
+  selectedEvent: selectedEventReducer,
 });
 
 export default reducers;

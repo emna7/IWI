@@ -13,6 +13,7 @@ import Container from '@material-ui/core/Container';
 import clubImage from '../assets/club.jpg';
 import gigImage from '../assets/gig.jpg';
 import eventImage from '../assets/event.jpg';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -68,6 +69,8 @@ const cards = [
 
 const Homepage = () => {
   const classes = useStyles();
+  const currentUser = useSelector((state) => state.currentUser);
+
   return (
     <React.Fragment>
       <main>
@@ -84,24 +87,32 @@ const Homepage = () => {
             <Typography variant="h5" align="center" color="textSecondary" paragraph>
               Iwi means People in Maori
             </Typography>
-            <div className={classes.heroButtons}>
-              <Grid container spacing={2} justify="center">
-                <Grid item>
-                    <Link className={classes.link} to='/signup'>
-                      <Button variant="contained" color="primary">
-                        Create an account
-                      </Button>
-                    </Link>
+            {
+              !currentUser &&
+              <div className={classes.heroButtons}>
+                <Grid container spacing={2} justify="center">
+                  <Grid item>
+                      <Link className={classes.link} to='/events/create'>
+                        <Button variant="contained" color="primary">
+                          Create an event
+                        </Button>
+                      </Link>
+                      <Link className={classes.link} to='/signup'>
+                        <Button variant="contained" color="primary">
+                          Create an account
+                        </Button>
+                      </Link>
+                  </Grid>
+                  <Grid item>
+                      <Link className={classes.link} to='/login'>
+                        <Button variant="outlined" color="primary">
+                          Login
+                        </Button>
+                      </Link>
+                  </Grid>
                 </Grid>
-                <Grid item>
-                    <Link className={classes.link} to='/login'>
-                      <Button variant="outlined" color="primary">
-                        Login
-                      </Button>
-                    </Link>
-                </Grid>
-              </Grid>
-            </div>
+              </div>
+            }
           </Container>
         </div>
         <Container className={classes.cardGrid} maxWidth="md">

@@ -1,3 +1,5 @@
+// token of the app is stored under the name of "iwiToken"
+
 export const getFromStorage = (key) => {
   if (!key) {
     console.error('Error: Key is missing');

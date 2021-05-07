@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Event() {
+const CreateEvent = () => {
   const [paid, setPaid] = React.useState('paid');
 
 //   const handleChangePaid = (event) => {
@@ -197,4 +197,6 @@ export default function Event() {
       </Box>
     </Container>
   );
-}
+};
+
+export default CreateEvent;

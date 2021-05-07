@@ -188,13 +188,21 @@ usersRouter.delete('/:id', auth, async (req, res) => {
 
 // LOGOUT
 usersRouter.post('/logout', auth, async (req, res) => {
+  console.log(req.headers);
   try {
+    console.log(req.headers)
     const destroyed = await jwtr.destroy(req.user.jti);
-    res.header('auth-token', '');
+    res.headers('auth-token', '');
     console.log("logged out!", destroyed);
-    res.json("logged out!");
+    res.send({
+      status: 'success',
+      message: "logged out!"
+    });
   } catch (error) {
-    res.status(500).json({ message: error, });
+    res.send({
+      status: 'error',
+      message: error,
+    });
   }
 });
 
