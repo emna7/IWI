@@ -28,6 +28,13 @@ import {
   KeyboardDatePicker,
 } from '@material-ui/pickers';
 import axios from 'axios';
+import { getFromStorage } from '../../utils/storage';
+import { useHistory } from 'react-router';
+import { TextField } from '@material-ui/core';
+
+const alertStyle = {
+  marginTop: 20,
+};
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -71,10 +78,13 @@ const useStyles = makeStyles((theme) => ({
 const createEvent = () => {
 
   const dispatch = useDispatch();
+  const history = useHistory();
   const classes = useStyles();
 
   const [currentState, setState] = React.useState({
+    eventSubmitMsg: '',
     title: '',
+    description: '',
     country: '',
     state: '',
     city: '',
@@ -105,9 +115,10 @@ const createEvent = () => {
 		});
 	};
 
-  const submitSearch = async () => {
+  const submitEvent = async () => {
     const {
       title,
+      description,
       country,
       state,
       city,
@@ -121,35 +132,72 @@ const createEvent = () => {
     
     for (const [k, v] of Object.entries(currentState)) {
       // console.log(`${k} = ${v}`);
-      if (v != null && v != undefined && v.trim() != '') {
+      if (v != null && v != undefined) {
         reqParams[k] = v;
       }
     }
 
+    console.log('-----------------')
     console.log(reqParams);
+    
+    let takesPlace = {
+      from: startDate,
+      to: endDate,
+    };
+    reqParams["takesPlace"] = takesPlace;
+    delete reqParams.startDate;
+    delete reqParams.endDate;
 
     const eventsData = await axios
-    .get(
+    .post(
       `${process.env.REACT_APP_API_URL}/events`,
       {
-        params: reqParams,
+        ...reqParams,
+      },
+      {
+        headers: {
+          'auth-token': getFromStorage('iwiToken'),
+        },
       },
     )
     .then((res) => {
       const { data } = res;
       result = data;
-      // console.log(result);
-      dispatch(searchEvents(result.data));
+      console.log(result);
+      // dispatch(searchEvents(result.data));
     })
     .catch((err) => {
       console.log(err);
     });
+
+    if (result) {
+      setState({
+        ...currentState,
+        eventSubmitMsg: result,
+      });
+      setTimeout(() => {
+        setState({
+          eventSubmitMsg: '',
+          title: '',
+          description: '',
+          country: '',
+          state: '',
+          city: '',
+          category: '',
+          startDate: null,
+          endDate: null,
+        });
+        if (result.status === 'success') {
+          history.push('/events');
+        }
+      }, 3000);
+    }
   };
 
-  const submitEvent = () => {};
-
   const {
+    eventSubmitMsg,
     title,
+    description,
     country,
     state,
     city,
@@ -182,6 +230,16 @@ const createEvent = () => {
               label='Event title'
               name='title'
               value={title}
+              onChange={(e) => handleInputChange(e)}
+              validators={['required']}
+              required={true}
+						  errorMessages={['this field is required']}
+            />
+            <TextValidator
+              id="standard-static"
+              label="Description"
+              name='description'
+              value={description}
               onChange={(e) => handleInputChange(e)}
               validators={['required']}
               required={true}
@@ -320,6 +378,19 @@ const createEvent = () => {
               }}
             />
           </MuiPickersUtilsProvider>
+
+          {
+						eventSubmitMsg && eventSubmitMsg.status === 'error' &&
+						<Alert severity="error" style={alertStyle}>
+							{eventSubmitMsg.message}
+						</Alert>
+					}
+					{
+						eventSubmitMsg && eventSubmitMsg.status === 'success' &&
+						<Alert severity="success" style={alertStyle}>
+							{eventSubmitMsg.message}
+						</Alert>
+					}
 
           <Button
             type="submit"

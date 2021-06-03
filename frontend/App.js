@@ -17,6 +17,7 @@ import SignUp from './components/user/Signup';
 import EventPage from './components/event/EventPage';
 import CreateEvent from './components/event/CreateEvent';
 import { useSelector } from 'react-redux';
+import UserPage from './components/user/UserPage';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -49,6 +50,7 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles();
   const currentUser = useSelector((state) => state.currentUser);
+  const selectedEvent = useSelector((state) => state.selectedEvent);
 
   return (
     <div className="App">
@@ -77,7 +79,12 @@ function App() {
           </Route>
           <Route path='/events/:eventId' exact>
             {
-              currentUser ? <EventPage /> : <Redirect to='/login' />
+              currentUser ? <EventPage selectedEvent={selectedEvent} /> : <Redirect to='/login' />
+            }
+          </Route>
+          <Route path='/users/:userId' exact>
+            {
+              currentUser ? <UserPage /> : <Redirect to='/login' />
             }
           </Route>
         </Switch>

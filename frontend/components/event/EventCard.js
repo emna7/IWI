@@ -67,7 +67,14 @@ const EventCard = (props) => {
 	const history = useHistory();
   const { event, } = props;
 
-  const handleEventChoice = () => {
+  if (props && props.event) {
+    console.log('*************')
+    console.log(event);
+  }
+
+  console.log(event);
+
+  const handleEventChoice = (event) => {
     // const chosenEvent = props.event;
     
     console.log(`chosenEvent --> ${event}`);
@@ -75,7 +82,7 @@ const EventCard = (props) => {
     dispatch(selectEvent(event));
     setTimeout(() => {
       history.push(`/events/${event._id}`);
-    }, 400);
+    }, 750);
   };
   
   const handleExpandClick = () => {
@@ -115,14 +122,14 @@ const EventCard = (props) => {
                     <AccessTimeIcon />{`  `}
                     <strong>Start date </strong>
                   </>
-                  { moment(event.startDate).format('MMMM Do YYYY') }
+                  { moment(event['takesPlace']['from']).format('MMMM Do YYYY') }
                 </Box>
                 <Box mt={1} className="date start" component="div" display="block">
                   <>
                     <AccessTimeIcon />{`  `}
                     <strong>End date </strong>
                   </>
-                  { moment(event.endDate).format('MMMM Do YYYY') }
+                  { moment(event['takesPlace']['to']).format('MMMM Do YYYY') }
                 </Box>
               </Box>
             </div>
@@ -134,7 +141,7 @@ const EventCard = (props) => {
         </div>
       </CardContent>
       <CardActions disableSpacing>
-        <Button size="small" color="primary" onClick={handleEventChoice}>
+        <Button size="small" color="primary" onClick={(e) => handleEventChoice(event)}>
           View
         </Button>
         <IconButton

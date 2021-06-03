@@ -1,7 +1,7 @@
 import './EventPage.css';
 import { getFromStorage, } from './../../utils/storage';
-import React, { Fragment } from 'react';
-import { useSelector, useState, } from 'react-redux';
+import React, { useState, } from 'react';
+import { useSelector, } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
@@ -13,13 +13,32 @@ import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import eventImage from './../../../assets/event.jpg';
 import moment from 'moment';
 import axios from 'axios';
+import Alert from '@material-ui/lab/Alert';
+
+const alertStyle = {
+  marginTop: 20,
+};
+
+const resMsg = (msg) => {
+  return (
+    <Alert severity={msg.status === 'success' ? 'success' : 'error'} style={alertStyle}>
+      {msg.message}
+    </Alert>
+  );
+};
 
 const EventPage = (props) => {
   const { eventId, } = useParams();
   // const { event, } = props;
-  const [ eventPageMsg, setEventPageMsg, ] = useState('');
+  const [ eventPageMsg, setEventPageMsg, ] = useState();
 
-  const event = useSelector((state) => state.selectedEvent);
+  let event = useSelector((state) => state.selectedEvent);
+  // if (!event.title) {
+  //   event = props.event;
+  // }
+
+  console.log(event);
+  
   const currentUser = useSelector((state) => state.currentUser);
   const token = getFromStorage('iwiToken');
 
@@ -34,7 +53,7 @@ const EventPage = (props) => {
       }
     ).then((res) => {
       let result = res.data;
-      setEventPageMsg(res.message);
+      setEventPageMsg(res);
     }).catch((err) => {
       console.log(err);
     });
@@ -47,7 +66,7 @@ const EventPage = (props) => {
           <Box component="div" display="block">
             <img
               className="cover_image"
-              src={event.image ? event.image : eventImage}
+              src={eventImage}
             />
           </Box>
           <Box className="item-title-desc" component="div" display="block">
@@ -60,11 +79,11 @@ const EventPage = (props) => {
           <Box className="item-date" component="div" display="block">
             <Box mt={1} className="date start" component="div" display="block">
               <strong>Start date:</strong><br />
-              <AccessTimeIcon /> { moment(event.startDate).format('MMMM Do YYYY') }
+              <AccessTimeIcon /> { moment(event.takesPlace.from).format('MMMM Do YYYY') }
             </Box>
             <Box mt={1} className="date start" component="div" display="block">
               <strong>End date:</strong><br />
-              <AccessTimeIcon /> { moment(event.endDate).format('MMMM Do YYYY') }
+              <AccessTimeIcon /> { moment(event.takesPlace.to).format('MMMM Do YYYY') }
             </Box>
           </Box>
 
@@ -115,6 +134,9 @@ const EventPage = (props) => {
               </a>
             </Box>
           </Box>
+          {
+
+          }
         </Container>
       </body>
     </div>

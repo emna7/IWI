@@ -59,6 +59,9 @@ eventsRouter.get('/:id', async (req, res) => {
 eventsRouter.post('/', auth, async (req, res) => {
   try {
     const event = new Event({...req.body, createdBy: req.user._id});
+    console.log('----------------')
+    console.log(req.body);
+
     const savedEvent = await event.save();
     let updateduser = await User.updateOne(
       { _id: event.createdBy},

@@ -1,37 +1,26 @@
 import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
-import AddIcon from '@material-ui/icons/Add';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio'
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import Link from '@material-ui/core/Link';
+import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import Select from '@material-ui/core/Select';
+import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import categories from './../../utils/categories';
+import { useSelector, useDispatch, } from 'react-redux';
+import { searchClubs,} from '../../redux/actions/clubActions';
+import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
+import Alert from '@material-ui/lab/Alert';
+import axios from 'axios';
+import { getFromStorage } from '../../utils/storage';
+import { useHistory } from 'react-router';
+import { TextField } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -64,75 +53,175 @@ const useStyles = makeStyles((theme) => ({
 
   formControl: {
     marginTop: theme.spacing(1),
-    width: "50%",
-    marginBottom: theme.spacing(3),
+    width: "100%",
+    marginBottom: theme.spacing(1),
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
 }));
 
-export default function Club() {
-  const [privacy, setPrivacy] = React.useState('public');
+const createClub = () => {
 
-  const handleChangePrivacy = (event) => {
-    setPrivacy(event.target.privacy);
-  };
-  const [category, setCategory] = React.useState('');
-
-  const handleChangeCategory = (event) => {
-    setCategory(event.target.category);
-  };
+  const dispatch = useDispatch();
+  const history = useHistory();
   const classes = useStyles();
+
+  const [currentState, setState] = React.useState({
+    clubSubmitMsg: '',
+    title: '',
+    description: '',
+    category: '',
+  });
+
+  const handleInputChange = (e) => {
+		const {name, value} = e.target;
+		setState({
+			...currentState,
+			[name]: value,
+		});
+	};
+
+  const submitClub = async () => {
+    const {
+      title,
+      description,
+      category,
+    } = currentState;
+
+    let result;
+    let reqParams = {};
+    
+    for (const [k, v] of Object.entries(currentState)) {
+      // console.log(`${k} = ${v}`);
+      if (v != null && v != undefined) {
+        reqParams[k] = v;
+      }
+    }
+
+    console.log(reqParams);
+
+    const eventsData = await axios
+    .post(
+      `${process.env.REACT_APP_API_URL}/clubs`,
+      {
+        params: reqParams,
+      },
+      {
+        headers: {
+          'auth-token': getFromStorage('iwiToken'),
+        },
+      },
+    )
+    .then((res) => {
+      const { data } = res;
+      result = data;
+      console.log(result);
+      // dispatch(searchEvents(result.data));
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+    if (result) {
+      setState({
+        ...currentState,
+        clubSubmitMsg: result,
+      });
+      setTimeout(() => {
+        setState({
+          clubSubmitMsg: '',
+          title: '',
+          description: '',
+          category: '',
+        });
+        if (result.status === 'success') {
+          history.push('/clubs');
+        }
+      }, 3000);
+    }
+  };
+
+  const {
+    clubSubmitMsg,
+    title,
+    description,
+    category,
+  } = currentState;
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
         <Container align="center" >
-        <Avatar align="center" className={classes.avatar}>
-          <AddIcon />
-        </Avatar>
+          <Avatar align="center" className={classes.avatar}>
+            <AddCircleIcon />
+          </Avatar>
         </Container>
         <Box textAlign="center">
-        <Typography  component="h1" variant="h5">
-          Create Clubs
-        </Typography>
+          <Typography  component="h1" variant="h5">
+            Create a club
+          </Typography>
         </Box>
-        <FormLabel className={classes.FormLabel} component="legend">Name:</FormLabel>
+        <Grid container justify="space-around">
+          <ValidatorForm
+            onSubmit={submitClub}
+          >
+            <TextValidator
+              className={classes.formControl}
+              id='standard-basic'
+              label='Event title'
+              name='title'
+              value={title}
+              onChange={(e) => handleInputChange(e)}
+              validators={['required']}
+              required={true}
+						  errorMessages={['this field is required']}
+            />
+            <TextField
+              id="standard-static"
+              label="Description"
+              name='description'
+              multiline
+              rows={6}
+              value={description}
+              onChange={(e) => handleInputChange(e)}
+              required={true}
+            />
 
-        <form className={classes.root} noValidate autoComplete="off">
-        <TextField id="outlined-basic" variant="outlined" />
-        </form>
-          <FormControl className={classes.FormLabel} component="fieldset">
-            <FormLabel component="legend">Privacy:</FormLabel>
-            <RadioGroup row aria-label="clubs" name="clubs1" value={privacy} onChange={handleChangePrivacy}>
-              <FormControlLabel value="public" control={<Radio />} label="Public" />
-              <FormControlLabel value="private" control={<Radio />} label="Private" />
-            </RadioGroup>
-          </FormControl>
-
-          <FormLabel className={classes.FormLabel} component="legend">Description:</FormLabel>
-
-          <FormLabel component="legend">Category:</FormLabel>
-          <FormControl variant="filled" className={classes.FormLabel, classes.formControl}>
-            
-            
-            <InputLabel id="demo-simple-select-filled-label">Ex: Sport</InputLabel>
+          {/* CATEGORY */}
+          <FormControl className={classes.formControl}>
+            <InputLabel id="demo-simple-select-label">Category</InputLabel>
             <Select
-              labelId="demo-simple-select-filled-label"
-              id="demo-simple-select-filled"
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
               value={category}
-              onChange={handleChangeCategory}
+              name='category'
+              onChange={(e) => handleInputChange(e)}
+              validators={['required']}
+              required={true}
+						  errorMessages={['this field is required']}
             >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value={10}>Ten</MenuItem>
-              <MenuItem value={20}>Twenty</MenuItem>
-              <MenuItem value={30}>Thirty</MenuItem>
+              <MenuItem value=''>None</MenuItem>
+              {
+                categories.map((l, i) => {
+                  return <MenuItem key={i} value={l}>{l}</MenuItem>
+                })
+              }
             </Select>
           </FormControl>
+          {
+						clubSubmitMsg && clubSubmitMsg.status === 'error' &&
+						<Alert severity="error" style={alertStyle}>
+							{clubSubmitMsg.message}
+						</Alert>
+					}
+					{
+						clubSubmitMsg && clubSubmitMsg.status === 'success' &&
+						<Alert severity="success" style={alertStyle}>
+							{clubSubmitMsg.message}
+						</Alert>
+					}
 
           <Button
             type="submit"
@@ -141,13 +230,13 @@ export default function Club() {
             color="primary"
             className={classes.submit}
           >
-            Create Club
+            Add Club
           </Button>
-          
+          </ValidatorForm>
+        </Grid>
       </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
     </Container>
   );
-}
+};
+
+export default createClub;
